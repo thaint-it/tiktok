@@ -1,1 +1,1 @@
-const String tiktokScreenRoute = "tiktok";
+const String postScreenRoute = "tiktok";

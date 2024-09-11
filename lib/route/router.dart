@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 Route<dynamic> generateRoute(RouteSettings settings) {
   switch (settings.name) {
-    case tiktokScreenRoute:
+    case postScreenRoute:
       return MaterialPageRoute(
         builder: (context) => const PostScreen(),
       );

@@ -64,7 +64,7 @@ class _PostScreenState extends State<PostScreen> {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(size / 2),
                 child: Image.asset(
-                  "assets/tiktok/profile.jpeg",
+                  "assets/icons/profile.jpeg",
                   fit: BoxFit.cover,
                 ),
               ),
@@ -122,7 +122,7 @@ class _PostScreenState extends State<PostScreen> {
           title: Align(
             alignment: Alignment.topCenter,
             child: SvgPicture.asset(
-              "assets/tiktok/live.svg",
+              "assets/icons/live.svg",
               colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
               width: 24,
             ),
@@ -156,7 +156,7 @@ class _PostScreenState extends State<PostScreen> {
                   // Navigator.pushNamed(context, searchScreenRoute);
                 },
                 icon: SvgPicture.asset(
-                  "assets/icons/Search.svg",
+                  "assets/icons/search.svg",
                   height: 24,
                   colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
                 ),
@@ -217,7 +217,7 @@ class _PostScreenState extends State<PostScreen> {
                                                       shape: BoxShape.circle,
                                                     ),
                                                     child: svgIcon(
-                                                        "assets/tiktok/plus.svg",
+                                                        "assets/icons/plus.svg",
                                                         color: Colors.white,
                                                         height: 12)),
                                               )),
@@ -254,7 +254,7 @@ class _PostScreenState extends State<PostScreen> {
                                         InkWell(
                                           onTap: () => {},
                                           child: svgIcon(
-                                              "assets/tiktok/comment.svg",
+                                              "assets/icons/comment.svg",
                                               color: Colors.white),
                                         ),
                                         const SizedBox(
@@ -264,7 +264,7 @@ class _PostScreenState extends State<PostScreen> {
                                         InkWell(
                                           onTap: () => {},
                                           child: svgIcon(
-                                              "assets/tiktok/share.svg",
+                                              "assets/icons/share.svg",
                                               color: Colors.white),
                                         ),
                                         const SizedBox(
@@ -326,16 +326,16 @@ class _PostScreenState extends State<PostScreen> {
               items: [
                 BottomNavigationBarItem(
                   icon:
-                      svgIcon("assets/tiktok/home.svg", color: Colors.white70),
+                      svgIcon("assets/icons/home.svg", color: Colors.white70),
                   activeIcon:
-                      svgIcon("assets/tiktok/home.svg", color: Colors.white),
+                      svgIcon("assets/icons/home.svg", color: Colors.white),
                   label: "Trang chủ",
                 ),
                 BottomNavigationBarItem(
                   icon:
-                      svgIcon("assets/tiktok/shop.svg", color: Colors.white70),
+                      svgIcon("assets/icons/shop.svg", color: Colors.white70),
                   activeIcon:
-                      svgIcon("assets/tiktok/shop.svg", color: Colors.white),
+                      svgIcon("assets/icons/shop.svg", color: Colors.white),
                   label: "Cửa hàng",
                 ),
                 BottomNavigationBarItem(
@@ -344,16 +344,16 @@ class _PostScreenState extends State<PostScreen> {
                 ),
                 BottomNavigationBarItem(
                   icon:
-                      svgIcon("assets/tiktok/chat.svg", color: Colors.white70),
+                      svgIcon("assets/icons/chat.svg", color: Colors.white70),
                   activeIcon:
-                      svgIcon("assets/tiktok/chat.svg", color: Colors.white),
+                      svgIcon("assets/icons/chat.svg", color: Colors.white),
                   label: "Hộp thư",
                 ),
                 BottomNavigationBarItem(
                   icon:
-                      svgIcon("assets/tiktok/user.svg", color: Colors.white70),
+                      svgIcon("assets/icons/user.svg", color: Colors.white70),
                   activeIcon:
-                      svgIcon("assets/tiktok/user.svg", color: Colors.white),
+                      svgIcon("assets/icons/user.svg", color: Colors.white),
                   label: "Hồ sơ",
                 ),
               ]),

@@ -7,7 +7,7 @@ class AppTheme {
   static ThemeData lightTheme(BuildContext context){
     return ThemeData(
       brightness: Brightness.light,
-      fontFamily: "Plus Jakarta",
+      fontFamily: "Tiktok",
       primarySwatch: primaryMaterialColor,
       primaryColor: primaryColor,
       scaffoldBackgroundColor: Colors.white,

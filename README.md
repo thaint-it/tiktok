@@ -1,4 +1,4 @@
-# clothes_shop
+# tiktok_clone
 
 A new Flutter project.
 
