@@ -33,6 +33,7 @@ flutter:
   assets:
   - assets/images/
   - assets/icons/
+  - assets/avatars/
   fonts:
     - family: Tiktok
       fonts:
@@ -40,3 +41,4 @@ flutter:
         - asset:  assets/fonts/tiktok/TikTokText-Medium.otf
         - asset:  assets/fonts/tiktok/TikTokText-Bold.otf
           style: italic
+        

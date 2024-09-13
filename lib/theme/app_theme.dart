@@ -4,7 +4,7 @@ import 'package:tiktok_clone/theme/theme_data.dart';
 import 'package:flutter/material.dart';
 
 class AppTheme {
-  static ThemeData lightTheme(BuildContext context){
+  static ThemeData lightTheme(BuildContext context) {
     return ThemeData(
       brightness: Brightness.light,
       fontFamily: "Tiktok",
@@ -12,8 +12,9 @@ class AppTheme {
       primaryColor: primaryColor,
       scaffoldBackgroundColor: Colors.white,
       iconTheme: const IconThemeData(color: blackColor),
+      bottomSheetTheme: BottomSheetThemeData(backgroundColor: whiteColor),
       textTheme: const TextTheme(
-        bodyMedium: TextStyle(color: blackColor40),
+      
       ),
       elevatedButtonTheme: elevatedButtonThemeData,
       // textButtonTheme: textButtonThemeData,

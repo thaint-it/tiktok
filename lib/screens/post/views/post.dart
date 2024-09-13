@@ -4,6 +4,7 @@ import 'package:tiktok_clone/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:like_button/like_button.dart';
+import 'package:tiktok_clone/screens/comment/views/comment.dart';
 import 'package:tiktok_clone/screens/post/views/components/custome_icon.dart';
 
 class AppBarItem {
@@ -109,6 +110,10 @@ class _PostScreenState extends State<PostScreen> {
       return Future.value(!_isMarked);
     }
 
+    void showComment() {
+      showModalBottomSheet(context: context, builder: (ctx) => CommentScreen());
+    }
+
     return Scaffold(
         extendBodyBehindAppBar: true,
         backgroundColor: Colors.black,
@@ -144,7 +149,6 @@ class _PostScreenState extends State<PostScreen> {
                     item.isSelected
                         ? Container(height: 2, width: 30, color: Colors.white)
                         : SizedBox(height: 2)
-                    
                   ],
                 ),
               );
@@ -252,7 +256,7 @@ class _PostScreenState extends State<PostScreen> {
                                         genCount(markCount),
                                         const SizedBox(height: defaultPadding),
                                         InkWell(
-                                          onTap: () => {},
+                                          onTap: showComment,
                                           child: svgIcon(
                                               "assets/icons/comment.svg",
                                               color: Colors.white),
@@ -325,15 +329,13 @@ class _PostScreenState extends State<PostScreen> {
               backgroundColor: Colors.black,
               items: [
                 BottomNavigationBarItem(
-                  icon:
-                      svgIcon("assets/icons/home.svg", color: Colors.white70),
+                  icon: svgIcon("assets/icons/home.svg", color: Colors.white70),
                   activeIcon:
                       svgIcon("assets/icons/home.svg", color: Colors.white),
                   label: "Trang chủ",
                 ),
                 BottomNavigationBarItem(
-                  icon:
-                      svgIcon("assets/icons/shop.svg", color: Colors.white70),
+                  icon: svgIcon("assets/icons/shop.svg", color: Colors.white70),
                   activeIcon:
                       svgIcon("assets/icons/shop.svg", color: Colors.white),
                   label: "Cửa hàng",
@@ -343,15 +345,13 @@ class _PostScreenState extends State<PostScreen> {
                   label: "",
                 ),
                 BottomNavigationBarItem(
-                  icon:
-                      svgIcon("assets/icons/chat.svg", color: Colors.white70),
+                  icon: svgIcon("assets/icons/chat.svg", color: Colors.white70),
                   activeIcon:
                       svgIcon("assets/icons/chat.svg", color: Colors.white),
                   label: "Hộp thư",
                 ),
                 BottomNavigationBarItem(
-                  icon:
-                      svgIcon("assets/icons/user.svg", color: Colors.white70),
+                  icon: svgIcon("assets/icons/user.svg", color: Colors.white70),
                   activeIcon:
                       svgIcon("assets/icons/user.svg", color: Colors.white),
                   label: "Hồ sơ",
