@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:tiktok_clone/constants.dart';
 
 class CustomIcon extends StatelessWidget {
-  const CustomIcon({super.key});
+  const CustomIcon({super.key, this.isLightTheme = false});
+  final bool? isLightTheme;
 
   @override
   Widget build(BuildContext context) {
@@ -45,12 +47,12 @@ class CustomIcon extends StatelessWidget {
               height: double.infinity,
               width: 38,
               decoration: BoxDecoration(
-                color:  Colors.white,
+                color: isLightTheme == true ? blackColor : whiteColor,
                 borderRadius: BorderRadius.circular(7),
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.add,
-                color: Colors.black,
+                color: isLightTheme == true ? whiteColor : blackColor,
                 size: 20,
               ),
             ),

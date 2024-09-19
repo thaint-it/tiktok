@@ -3,18 +3,18 @@
 import 'package:flutter/material.dart';
 import 'package:tiktok_clone/components/avatar.dart';
 import 'package:tiktok_clone/constants.dart';
-import 'package:tiktok_clone/models/comment_model.dart';
+import 'package:tiktok_clone/models/comment/comment_data.dart';
 
 class CommentItem extends StatefulWidget {
   const CommentItem({super.key, required this.comment});
-  final CommentModel comment;
+  final CommentData comment;
 
   @override
   State<CommentItem> createState() => _CommentItemState();
 }
 
 class _CommentItemState extends State<CommentItem> {
-  buildComment(CommentModel comment, isRoot) {
+  buildComment(CommentData comment, isRoot) {
     return Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Avatar(size: isRoot ? 24 : 16, url: comment.avatar),
       const SizedBox(
@@ -28,7 +28,7 @@ class _CommentItemState extends State<CommentItem> {
           Row(
             children: [
               Text(
-                comment.fullName,
+                comment.userName,
                 style:
                     TextStyle(fontWeight: FontWeight.bold, color: blackColor80),
               ),
@@ -48,13 +48,13 @@ class _CommentItemState extends State<CommentItem> {
           //user name
 
           const SizedBox(height: defaultPadding / 4),
-          Text(comment.text),
+          Text(comment.content),
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                comment.time,
+                comment.created.toString(),
                 style: TextStyle(color: blackColor40, fontSize: 12),
               ),
               const SizedBox(
@@ -73,11 +73,11 @@ class _CommentItemState extends State<CommentItem> {
                   color: Colors.white,
                   child: Column(
                     children: [
-                      ...widget.comment.childComments
+                      ...widget.comment.children
                           .asMap()
                           .entries
                           .map((entry) {
-                        CommentModel childComment = entry.value;
+                        CommentData childComment = entry.value;
                         return buildComment(childComment, false);
                       })
                     ],

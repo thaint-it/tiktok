@@ -3,7 +3,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:tiktok_clone/constants.dart';
-import 'package:tiktok_clone/models/comment_model.dart';
+import 'package:tiktok_clone/models/comment/comment.dart';
+import 'package:tiktok_clone/models/comment/comment_data.dart';
 import 'package:tiktok_clone/screens/comment/views/components/comment_item.dart';
 
 class CommentScreen extends StatefulWidget {
@@ -14,74 +15,74 @@ class CommentScreen extends StatefulWidget {
 }
 
 class _CommentScreenState extends State<CommentScreen> {
-  List<CommentModel> comments = [
-    CommentModel(
-        id: 1,
-        text: "này cực với vất vả lắm cố gắng với đam mê nhé bạn",
-        fullName: "..._57505",
-        time: "12 giờ",
-        avatar: "assets/avatars/av1.jpg",
-        childComments: [
-          CommentModel(
-              id: 2,
-              parentId: 1,
-              text: "Theo nghề này thì phải cố gắng thôi bác",
-              fullName: "T11n",
-              time: "12 giờ",
-              avatar: "assets/avatars/me.jpg",
-              isCreator: true),
-        ]),
-    CommentModel(
-        id: 3,
-        text: "Xin nguồn tự học ạ",
-        fullName: "Akova Duong",
-        time: "10 giờ",
-        avatar: "assets/avatars/av2.jpg",
-        childComments: [
-          CommentModel(
-              id: 2,
-              parentId: 1,
-              text:
-                  "Đọc docs thôi ạ. Search thêm vài source template xem cách người ta tổ chức code với dùng thư viện bên thứ 3. Mình cũng mới học được vài hôm",
-              fullName: "T11n",
-              time: "12 giờ",
-              avatar: "assets/avatars/me.jpg",
-              isCreator: true),
-          CommentModel(
-              id: 2,
-              parentId: 1,
-              text: "Bác có link template không cho em xin với",
-              fullName: "Tiktoker 1",
-              time: "1 giờ",
-              avatar: "assets/avatars/av3.jpg",
-              isCreator: false),
-          CommentModel(
-              id: 2,
-              parentId: 1,
-              text:
-                  "bác lên google seach flutter code git template là ra 1 đống",
-              fullName: "T11N",
-              time: "1 giờ",
-              avatar: "assets/avatars/me.jpg",
-              isCreator: true),
-          CommentModel(
-              id: 2,
-              parentId: 1,
-              text: "Ok thank bác.",
-              fullName: "Tiktoker 1",
-              time: "1 giờ",
-              avatar: "assets/avatars/av3.jpg",
-              isCreator: false),
-            CommentModel(
-              id: 2,
-              parentId: 1,
-              text:
-                  "Bác có thắc mắc gì thì comment mình biết thì giải đáp cho, không thì nhờ mấy ae giải đáp hộ.",
-              fullName: "T11N",
-              time: "vừa xong",
-              avatar: "assets/avatars/me.jpg",
-              isCreator: true),
-        ])
+  List<CommentData> comments = [
+    // CommentData(
+    //     id: 1,
+    //     content: "này cực với vất vả lắm cố gắng với đam mê nhé bạn",
+    //     userName: "..._57505",
+    //     created: DateTime.now(),
+    //     avatar: "assets/avatars/av1.jpg",
+    //     children: [
+    //       CommentData(
+    //           id: 2,
+    //           parentId: 1,
+    //           text: "Theo nghề này thì phải cố gắng thôi bác",
+    //           userName: "T11n",
+    //           created: "12 giờ",
+    //           avatar: "assets/avatars/me.jpg",
+    //           isCreator: true),
+    //     ]),
+    // Comment(
+    //     id: 3,
+    //     text: "Xin nguồn tự học ạ",
+    //     userName: "Akova Duong",
+    //     created: "10 giờ",
+    //     avatar: "assets/avatars/av2.jpg",
+    //     children: [
+    //       Comment(
+    //           id: 2,
+    //           parentId: 1,
+    //           text:
+    //               "Đọc docs thôi ạ. Search thêm vài source template xem cách người ta tổ chức code với dùng thư viện bên thứ 3. Mình cũng mới học được vài hôm",
+    //           userName: "T11n",
+    //           created: "12 giờ",
+    //           avatar: "assets/avatars/me.jpg",
+    //           isCreator: true),
+    //       Comment(
+    //           id: 2,
+    //           parentId: 1,
+    //           text: "Bác có link template không cho em xin với",
+    //           userName: "Tiktoker 1",
+    //           created: "1 giờ",
+    //           avatar: "assets/avatars/av3.jpg",
+    //           isCreator: false),
+    //       Comment(
+    //           id: 2,
+    //           parentId: 1,
+    //           text:
+    //               "bác lên google seach flutter code git template là ra 1 đống",
+    //           userName: "T11N",
+    //           created: "1 giờ",
+    //           avatar: "assets/avatars/me.jpg",
+    //           isCreator: true),
+    //       Comment(
+    //           id: 2,
+    //           parentId: 1,
+    //           text: "Ok thank bác.",
+    //           userName: "Tiktoker 1",
+    //           created: "1 giờ",
+    //           avatar: "assets/avatars/av3.jpg",
+    //           isCreator: false),
+    //         Comment(
+    //           id: 2,
+    //           parentId: 1,
+    //           text:
+    //               "Bác có thắc mắc gì thì comment mình biết thì giải đáp cho, không thì nhờ mấy ae giải đáp hộ.",
+    //           userName: "T11N",
+    //           created: "vừa xong",
+    //           avatar: "assets/avatars/me.jpg",
+    //           isCreator: true),
+    //     ])
   ];
   @override
   Widget build(BuildContext context) {
@@ -232,7 +233,7 @@ class _CommentScreenState extends State<CommentScreen> {
                   child: Column(
                     children: [
                       ...comments.asMap().entries.map((entry) {
-                        CommentModel comment = entry.value;
+                        CommentData comment = entry.value;
                         return CommentItem(comment: comment);
                       })
                     ],
