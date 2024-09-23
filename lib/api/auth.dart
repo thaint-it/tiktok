@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:tiktok_clone/api/client.dart';
@@ -30,6 +32,28 @@ class AuthService {
           await _dio.dio.post(Endpoints.register, data: user.toJson());
       return UserResponse.fromJson(response.data);
     } on DioException catch (err) {
+      final errorMessage = DioClientException.fromDioError(err).toString();
+      throw errorMessage;
+    } catch (e) {
+      if (kDebugMode) print(e);
+      throw e.toString();
+    }
+  }
+
+  Future<UserAvatar?> changeAvatar(
+      {required userId, required File avatar}) async {
+    try {
+      // Create form data
+      FormData formData = FormData.fromMap({
+        'avatar': await MultipartFile.fromFile(avatar.path),
+        'user_id': userId,
+      });
+      print('created formdata $formData');
+      final response = await _dio.dio.post(Endpoints.changeAvatar, data: formData);
+      print("om $response");
+      return UserAvatar.fromJson(response.data);
+    } on DioException catch (err) {
+      print('falure $err');
       final errorMessage = DioClientException.fromDioError(err).toString();
       throw errorMessage;
     } catch (e) {

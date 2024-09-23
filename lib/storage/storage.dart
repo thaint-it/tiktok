@@ -29,10 +29,11 @@ class StorageService {
     await prefs.setString('user', userStr);
     userTokenNotifier.value = userStr;
   }
+  
 
   Future<String?> getToken() async {
     final prefs = await SharedPreferences.getInstance();
-    String? token = prefs.getString('token');
+    String? token = prefs.getString('auth_token');
     rfTokenNotifier.value = token;
     return token;
   }
@@ -57,7 +58,6 @@ class StorageService {
     Map<String, dynamic> userMap = jsonDecode(userJson);
 
     final user = User.fromJson(userMap);
-    print("userdecode ${user.userId}");
     return user;
   }
 

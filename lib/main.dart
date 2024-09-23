@@ -22,6 +22,7 @@ void main() async {
     userProvider.setUser(UserData(
         id: user.id,
         userId: user.userId,
+        avatar: user.avatar,
         username: user.username,
         email: user.email));
   }

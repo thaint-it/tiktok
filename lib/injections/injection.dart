@@ -6,8 +6,9 @@ import 'package:tiktok_clone/storage/storage.dart';
 final getIt = GetIt.instance;
 
 void configureDependencies() {
-  getIt.registerLazySingleton<DioClient>(() => DioClient());
   getIt.registerLazySingleton<StorageService>(() => StorageService());
+  getIt.registerLazySingleton<DioClient>(
+      () => DioClient(getIt<StorageService>()));
   getIt.registerLazySingleton<AuthService>(
       () => AuthService(getIt<DioClient>()));
 }

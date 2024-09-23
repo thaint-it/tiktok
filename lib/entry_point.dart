@@ -9,6 +9,7 @@ import 'package:tiktok_clone/screens/auth/views/non_auth.dart';
 import 'package:tiktok_clone/screens/post/views/post.dart';
 import 'package:tiktok_clone/screens/profile/views/components/change_account.dart';
 import 'package:tiktok_clone/screens/profile/views/profile.dart';
+import 'package:tiktok_clone/screens/shop/shop_screen.dart';
 import 'package:tiktok_clone/utils/storage_helper.dart';
 
 class AppBarItem {
@@ -169,7 +170,7 @@ class _EntryPointScreenState extends State<EntryPointScreen> {
     } else {
       _pages = [
         PostScreen(),
-        Container(),
+        ShopScreen(),
         Container(),
         Container(),
         ProfileScreen()

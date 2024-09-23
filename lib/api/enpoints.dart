@@ -8,5 +8,7 @@ class Endpoints {
   static const int connectionTimeout = 3000;
 
   static const String login = '/auth/login';
+    static const String rfToken = '/auth/refresh_jwt_token';
   static const String register = '/auth/create_user';
+  static const String changeAvatar = '/auth/update_avatar';
 }

@@ -46,3 +46,14 @@ Map<String, dynamic> _$UserLoginToJson(UserLogin instance) => <String, dynamic>{
       'email': instance.email,
       'password': instance.password,
     };
+
+UserAvatar _$UserAvatarFromJson(Map<String, dynamic> json) => UserAvatar(
+      userId: json['user_id'] as String,
+      avatar: json['avatar'] as String,
+    );
+
+Map<String, dynamic> _$UserAvatarToJson(UserAvatar instance) =>
+    <String, dynamic>{
+      'user_id': instance.userId,
+      'avatar': instance.avatar,
+    };

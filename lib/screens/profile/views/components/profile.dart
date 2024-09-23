@@ -1,8 +1,10 @@
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:tiktok_clone/components/avatar.dart';
 import 'package:tiktok_clone/constants.dart';
 import 'package:tiktok_clone/models/auth/user_data.dart';
+import 'package:tiktok_clone/screens/profile/views/components/view_avatar.dart';
 
 class Profile extends StatefulWidget {
   const Profile({super.key, required this.userData});
@@ -14,6 +16,7 @@ class Profile extends StatefulWidget {
 
 class _ProfileState extends State<Profile> {
   late UserData userData;
+
   @override
   void initState() {
     super.initState();
@@ -39,7 +42,20 @@ class _ProfileState extends State<Profile> {
       children: [
         Align(
           child: Stack(children: [
-            Avatar(size: 60, url: userData.avatar, name: userData.username),
+            InkWell(
+              onTap: () => {
+                showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    builder: (ctx) => ChangeAvatar(userData: userData))
+              },
+              child: Avatar(
+                size: 60,
+                url: userData.avatar,
+                name: userData.username,
+                isNetwork: true,
+              ),
+            ),
             Positioned(
                 right: 5,
                 bottom: 0,

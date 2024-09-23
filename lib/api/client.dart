@@ -1,9 +1,13 @@
 import 'package:dio/dio.dart';
 import 'package:tiktok_clone/api/enpoints.dart';
 import 'package:tiktok_clone/api/interceptor.dart';
+import 'package:tiktok_clone/storage/storage.dart';
 
 class DioClient {
-  DioClient()
+  late final Dio dio;
+  final StorageService _storageService;
+
+  DioClient(this._storageService)
       : dio = Dio(
           BaseOptions(
             baseUrl: Endpoints.baseURL,
@@ -11,11 +15,7 @@ class DioClient {
             receiveTimeout: Duration(milliseconds: Endpoints.receiveTimeout),
             responseType: ResponseType.json,
           ),
-        )..interceptors.addAll([
-            AuthorizationInterceptor(),
-          ]);
-
-  late final Dio dio;
-
-
+        ) {
+    dio.interceptors.add(AuthorizationInterceptor(dio, _storageService));
+  }
 }

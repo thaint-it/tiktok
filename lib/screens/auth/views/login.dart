@@ -75,7 +75,7 @@ class _LoginScreenState extends State<LoginScreen> {
     String password = passwordController.text;
 
     try {
-      final response = await _authService.register(
+      final response = await _authService.login(
           user: UserLogin(email: email, password: password));
       if (response != null) {
         _storageService.setToken(response.jwtToken);

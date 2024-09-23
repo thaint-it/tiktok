@@ -68,3 +68,19 @@ class UserLogin extends Equatable {
 
   Map<String, dynamic> toJson() => _$UserLoginToJson(this);
 }
+
+
+@JsonSerializable()
+class UserAvatar {
+  @JsonKey(name: 'user_id') // Maps 'user_id' from JSON to 'userId'
+  final String userId;
+  final String avatar;
+
+  UserAvatar(
+      {required this.userId, required this.avatar});
+
+  factory UserAvatar.fromJson(Map<String, dynamic> json) =>
+      _$UserAvatarFromJson(json);
+
+  Map<String, dynamic> toJson() => _$UserAvatarToJson(this);
+}

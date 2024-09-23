@@ -59,7 +59,6 @@ class StorageHelper {
     Map<String, dynamic> userMap = jsonDecode(userJson);
 
     final user = User.fromJson(userMap);
-    print("userdecode ${user.userId}");
     return user;
   }
 }
