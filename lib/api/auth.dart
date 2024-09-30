@@ -49,11 +49,27 @@ class AuthService {
         'user_id': userId,
       });
       print('created formdata $formData');
-      final response = await _dio.dio.post(Endpoints.changeAvatar, data: formData);
+      final response =
+          await _dio.dio.post(Endpoints.changeAvatar, data: formData);
       print("om $response");
       return UserAvatar.fromJson(response.data);
     } on DioException catch (err) {
       print('falure $err');
+      final errorMessage = DioClientException.fromDioError(err).toString();
+      throw errorMessage;
+    } catch (e) {
+      if (kDebugMode) print(e);
+      throw e.toString();
+    }
+  }
+
+  Future<List<User>?> fetchUsers() async {
+    try {
+      final response = await _dio.dio.get(Endpoints.fetchUsers);
+      return (response.data as List<dynamic>?)
+          ?.map((e) => User.fromJson(e as Map<String, dynamic>))
+          .toList();
+    } on DioException catch (err) {
       final errorMessage = DioClientException.fromDioError(err).toString();
       throw errorMessage;
     } catch (e) {

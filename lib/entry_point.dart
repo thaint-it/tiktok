@@ -1,16 +1,27 @@
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:tiktok_clone/api/enpoints.dart';
 import 'package:tiktok_clone/components/custom_icon.dart';
 import 'package:tiktok_clone/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:animations/animations.dart';
+import 'package:tiktok_clone/injections/injection.dart';
+import 'package:tiktok_clone/models/auth/user.dart';
 import 'package:tiktok_clone/providers/user_data_provider.dart';
 import 'package:tiktok_clone/screens/auth/views/non_auth.dart';
+import 'package:tiktok_clone/screens/message/views/message.dart';
+import 'package:tiktok_clone/screens/post/views/create_post.dart';
 import 'package:tiktok_clone/screens/post/views/post.dart';
 import 'package:tiktok_clone/screens/profile/views/components/change_account.dart';
 import 'package:tiktok_clone/screens/profile/views/profile.dart';
 import 'package:tiktok_clone/screens/shop/shop_screen.dart';
+import 'package:tiktok_clone/storage/storage.dart';
 import 'package:tiktok_clone/utils/storage_helper.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
 
 class AppBarItem {
   String text;
@@ -26,21 +37,51 @@ class EntryPointScreen extends StatefulWidget {
 }
 
 class _EntryPointScreenState extends State<EntryPointScreen> {
+  final ImagePicker _picker = ImagePicker();
+  WebSocketChannel? channel;
+  StorageService storageService = getIt<StorageService>();
+  int unreadMessage = 10;
+  Future<void> initData() async {
+    User? user = await storageService.getUser();
+    print('user$user');
+    if (user != null) {
+      channel = WebSocketChannel.connect(
+        Uri.parse(
+            'ws://${Endpoints.socketURL}/ws/messages/${user.id}/'), // Update with your server URL
+      );
+      print("channel $channel");
+      channel!.stream.listen((message) {
+        print("recieve new message");
+        // // Handle incoming messages
+        final data = jsonDecode(message);
+        print('New message: ${data['message']}');
+        // You can also update your UI here
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    initData();
+  }
+
+  @override
+  void dispose() {
+    channel!.sink.close();
+    StorageHelper.authTokenNotifier.removeListener(() {});
+    super.dispose();
+  }
+
   List<AppBarItem> homeAppBarItems = [
-    AppBarItem(text: "Bạn bè", isSelected: false),
-    AppBarItem(text: "Đã Follow", isSelected: false),
-    AppBarItem(text: "Đề xuất", isSelected: true),
+    AppBarItem(text: "Friends", isSelected: false),
+    AppBarItem(text: "Following", isSelected: false),
+    AppBarItem(text: "For you", isSelected: true),
   ];
 
   late List<Widget> _pages;
 
   int selectedIndex = 0;
-
-  @override
-  void dispose() {
-    StorageHelper.authTokenNotifier.removeListener(() {});
-    super.dispose();
-  }
 
   appBarIconColor({isActive = false}) {
     if (selectedIndex == 0) {
@@ -54,104 +95,19 @@ class _EntryPointScreenState extends State<EntryPointScreen> {
     showModalBottomSheet(context: context, builder: (ctx) => ChangeAccount());
   }
 
-  buildAppbar(UserProvider userProvider) {
-    switch (selectedIndex) {
-      case 0:
-        return AppBar(
-          toolbarHeight: 40,
-          forceMaterialTransparency: true,
-          backgroundColor: Colors.black,
-          leading: const SizedBox(),
-          leadingWidth: 0,
-          centerTitle: false,
-          title: Align(
-            alignment: Alignment.topLeft,
-            child: SvgPicture.asset(
-              "assets/icons/live.svg",
-              colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
-              width: 24,
-            ),
-          ),
-          actions: [
-            ...homeAppBarItems.asMap().entries.map((entry) {
-              AppBarItem item = entry.value;
-              return TextButton(
-                onPressed: () => {},
-                child: Column(
-                  children: [
-                    Text(item.text,
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 15,
-                            fontWeight: item.isSelected
-                                ? FontWeight.bold
-                                : FontWeight.normal)),
-                    item.isSelected
-                        ? Container(height: 2, width: 30, color: Colors.white)
-                        : SizedBox(height: 2)
-                  ],
-                ),
-              );
-            }),
-            Align(
-              alignment: Alignment.topCenter,
-              child: IconButton(
-                onPressed: () {
-                  // Navigator.pushNamed(context, searchScreenRoute);
-                },
-                icon: SvgPicture.asset(
-                  "assets/icons/search.svg",
-                  height: 24,
-                  colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
-                ),
-              ),
-            )
-          ],
-        );
-      default:
-        return AppBar(
-          toolbarHeight: 40,
-          forceMaterialTransparency: true,
-          backgroundColor: whiteColor,
-          leading: const SizedBox(),
-          centerTitle: true,
-          title: Center(
-              child: TextButton(
-                  onPressed: showChangAccount,
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        userProvider.user?.username ?? "Profile",
-                        style: TextStyle(
-                            fontSize: 16,
-                            color: blackColor,
-                            fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(
-                        width: defaultPadding / 2,
-                      ),
-                      SvgPicture.asset("assets/icons/down-outline.svg",
-                          width: 14,
-                          colorFilter:
-                              ColorFilter.mode(blackColor, BlendMode.srcIn))
-                    ],
-                  ))),
-          actions: [
-            IconButton(
-              onPressed: () {
-                // Navigator.pushNamed(context, searchScreenRoute);
-              },
-              icon: SvgPicture.asset(
-                "assets/icons/menu.svg",
-                width: 24,
-                colorFilter: ColorFilter.mode(Colors.black, BlendMode.srcIn),
-              ),
-            )
-          ],
-        );
+  // pick image from galp-87y6iuhguyp-  ery
+  Future<void> pickVideoFromGallery() async {
+    // showModalBottomSheet(
+    //       context: context,
+    //       isScrollControlled: true,
+    //       builder: (ctx) => CreatePostScreen(video: File("dsadsa")),useSafeArea: false);
+    final pickedFile = await _picker.pickVideo(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      showModalBottomSheet(
+          context: context,
+          isScrollControlled: true,
+          builder: (ctx) => CreatePostScreen(video: File(pickedFile.path)));
     }
   }
 
@@ -172,7 +128,7 @@ class _EntryPointScreenState extends State<EntryPointScreen> {
         PostScreen(),
         ShopScreen(),
         Container(),
-        Container(),
+        MessageScreen(),
         ProfileScreen()
       ];
     }
@@ -190,9 +146,6 @@ class _EntryPointScreenState extends State<EntryPointScreen> {
     }
 
     return Scaffold(
-        extendBodyBehindAppBar: true,
-        backgroundColor: selectedIndex == 0 ? blackColor : whiteColor,
-        appBar: buildAppbar(userProvider),
         body: PageTransitionSwitcher(
           duration: defaultDuration,
           transitionBuilder: (child, animation, secondAnimation) {
@@ -222,10 +175,12 @@ class _EntryPointScreenState extends State<EntryPointScreen> {
                   color: appBarIconColor()),
               backgroundColor: selectedIndex == 0 ? Colors.black : Colors.white,
               onTap: (index) {
-                if (index != selectedIndex) {
+                if (index != 2 && index != selectedIndex) {
                   setState(() {
                     selectedIndex = index;
                   });
+                } else {
+                  pickVideoFromGallery();
                 }
               },
               items: [
@@ -248,8 +203,40 @@ class _EntryPointScreenState extends State<EntryPointScreen> {
                   label: "",
                 ),
                 BottomNavigationBarItem(
-                  icon: svgIcon("assets/icons/chat.svg",
-                      color: appBarIconColor()),
+                  // icon: svgIcon("assets/icons/chat.svg",
+                  //     color: appBarIconColor()),
+                  icon: Stack(
+                    clipBehavior: Clip.none, 
+                    children: [
+                      svgIcon("assets/icons/chat.svg",
+                          color: appBarIconColor()),
+                      if (unreadMessage > 0)
+                        Positioned(
+                          right: -10,
+                          top: -10,
+                          child: Container(
+                            padding: EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                            decoration: BoxDecoration(
+                              color: Colors.red,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            constraints: BoxConstraints(
+                              minWidth: 12,
+                              minHeight: 10,
+                            ),
+                            child: Center(
+                              child: Text(
+                                unreadMessage.toString(),
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
                   activeIcon: svgIcon("assets/icons/chat.svg",
                       color: appBarIconColor(isActive: true)),
                   label: "Hộp thư",

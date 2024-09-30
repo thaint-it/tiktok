@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tiktok_clone/api/enpoints.dart';
+import 'package:tiktok_clone/utils/utils.dart';
 
 class Avatar extends StatelessWidget {
   const Avatar(
@@ -14,11 +15,6 @@ class Avatar extends StatelessWidget {
   final bool? isNetwork;
   @override
   Widget build(BuildContext context) {
-    String resolveUrl(baseUrl, url) {
-      final baseURL = Uri.parse(baseUrl);
-      return baseURL.resolve(url).toString();
-    }
-
     return Container(
         decoration:
             BoxDecoration(shape: BoxShape.circle, color: Colors.grey.shade200),
@@ -28,7 +24,7 @@ class Avatar extends StatelessWidget {
           child: url != null
               ? ClipOval(
                   child: isNetwork == true
-                      ? Image.network(resolveUrl(Endpoints.baseURL, url))
+                      ? Image.network(Utils.resolveUrl(Endpoints.baseURL, url))
                       : Image.asset(
                           url ?? "assets/icons/user.svg",
                           width: size * 2,

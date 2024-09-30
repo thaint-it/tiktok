@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:tiktok_clone/constants.dart';
 import 'package:tiktok_clone/providers/user_data_provider.dart';
 import 'package:tiktok_clone/screens/auth/views/non_auth.dart';
+import 'package:tiktok_clone/screens/profile/views/components/change_account.dart';
 import 'package:tiktok_clone/screens/profile/views/components/content.dart';
 import 'package:tiktok_clone/screens/profile/views/components/profile.dart';
 
@@ -24,11 +25,59 @@ class _ProfileScreenState extends State<ProfileScreen> {
     "assets/icons/hidden-like.svg"
   ];
 
+  void showChangAccount() {
+    showModalBottomSheet(context: context, builder: (ctx) => ChangeAccount());
+  }
+
   @override
   Widget build(BuildContext context) {
     final userProvider = Provider.of<UserProvider>(context);
     return userProvider.user != null
         ? Scaffold(
+            appBar: AppBar(
+              toolbarHeight: 40,
+              forceMaterialTransparency: true,
+              backgroundColor: whiteColor,
+              leading: const SizedBox(),
+              centerTitle: true,
+              title: Center(
+                  child: TextButton(
+                      onPressed: showChangAccount,
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            userProvider.user?.username ?? "Profile",
+                            style: TextStyle(
+                                fontSize: 16,
+                                color: blackColor,
+                                fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(
+                            width: defaultPadding / 2,
+                          ),
+                          SvgPicture.asset("assets/icons/down-outline.svg",
+                              width: 14,
+                              colorFilter:
+                                  ColorFilter.mode(blackColor, BlendMode.srcIn))
+                        ],
+                      ))),
+              actions: [
+                IconButton(
+                  onPressed: () {
+                    // Navigator.pushNamed(context, searchScreenRoute);
+                  },
+                  icon: SvgPicture.asset(
+                    "assets/icons/menu.svg",
+                    width: 24,
+                    colorFilter:
+                        ColorFilter.mode(Colors.black, BlendMode.srcIn),
+                  ),
+                )
+              ],
+            ),
             body: SafeArea(
               child: CustomScrollView(
                 slivers: [

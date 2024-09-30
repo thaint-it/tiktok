@@ -1,10 +1,13 @@
 // ignore_for_file: no_leading_underscores_for_local_identifiers
 
-import 'package:tiktok_clone/constants.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:like_button/like_button.dart';
+import 'package:tiktok_clone/api/post.dart';
+import 'package:flutter/material.dart';
+import 'package:tiktok_clone/constants.dart';
+import 'package:tiktok_clone/injections/injection.dart';
+import 'package:tiktok_clone/models/post/post.dart';
 import 'package:tiktok_clone/screens/comment/views/comment.dart';
+import 'package:tiktok_clone/screens/post/views/post_item.dart';
 
 class AppBarItem {
   String text;
@@ -27,237 +30,166 @@ class _PostScreenState extends State<PostScreen> {
   int markCount = 111;
   int commentCount = 99;
   int shareCount = 111;
-  List<AppBarItem> appBarItems = [
-    AppBarItem(text: "Bạn bè", isSelected: false),
-    AppBarItem(text: "Đang Follow", isSelected: false),
-    AppBarItem(text: "Dành cho bạn", isSelected: true),
+  List<AppBarItem> homeAppBarItems = [
+    AppBarItem(text: "Friends", isSelected: false),
+    AppBarItem(text: "Following", isSelected: false),
+    AppBarItem(text: "For you", isSelected: true),
   ];
+
+  Future<bool> handleLikeTap(_isLiked) {
+    setState(() {
+      isLiked = !_isLiked;
+      likeCount = _isLiked ? likeCount - 1 : likeCount + 1;
+    });
+    return Future.value(!_isLiked);
+  }
+
+  Future<bool> handleMarkTap(_isMarked) {
+    setState(() {
+      isMarked = !_isMarked;
+      markCount = _isMarked ? markCount - 1 : markCount + 1;
+    });
+    return Future.value(!_isMarked);
+  }
+
+  void showComment() {
+    showModalBottomSheet(context: context, builder: (ctx) => CommentScreen());
+  }
+
+  final PageController _pageController = PageController(initialPage: 0);
+
+  List<Post> posts = []; // Danh sách URL video
+  final int perPage = 2;
+  int page = 1;
+  int currentPage = 0;
+  bool isLoading = false;
+  bool hasNext = true;
+  PostService postService = getIt<PostService>();
+
+  // Giả lập tải video ban đầu
+  Future<void> loadInitialPosts() async {
+    PostPagination? initialPost =
+        await postService.fetchPosts(page: page, perPage: perPage);
+
+    setState(() {
+      posts = initialPost.posts!;
+      hasNext = initialPost.hasNext!;
+    });
+  }
+
+  // reload new data
+  Future<void> refreshPage() async {
+    print("refresh page...");
+    setState(() {
+      page = 1;
+      hasNext = true;
+    });
+    await loadInitialPosts();
+  }
+
+  // Tải thêm video khi tới gần cuối danh sách
+  Future<void> loadMoreVideos() async {
+    if (hasNext) {
+      if (!isLoading) {
+        setState(() {
+          isLoading = true;
+        });
+      }
+      PostPagination? morePost =
+          await postService.fetchPosts(page: page + 1, perPage: perPage);
+      setState(() {
+        posts.addAll(morePost.posts!);
+        isLoading = false;
+        page = page + 1;
+        hasNext = morePost.hasNext!;
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    loadInitialPosts();
+  }
 
   @override
   Widget build(BuildContext context) {
-    SvgPicture svgIcon(String src, {Color? color, double? height}) {
-      return SvgPicture.asset(
-        src,
-        height: height ?? 24,
-        colorFilter: ColorFilter.mode(
-            color ??
-                Theme.of(context).iconTheme.color!.withOpacity(
-                    Theme.of(context).brightness == Brightness.dark ? 0.3 : 1),
-            BlendMode.srcIn),
-      );
-    }
-
-    buildProfile({double size = 60}) {
-      return SizedBox(
-        width: size + 10,
-        height: size + 10,
-        child: Stack(children: [
-          Positioned(
-            child: Container(
-              width: size,
-              height: size,
-              padding: const EdgeInsets.all(1),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(size / 2),
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(size / 2),
-                child: Image.asset(
-                  "assets/icons/profile.jpeg",
-                  fit: BoxFit.cover,
+    return Scaffold(
+       extendBodyBehindAppBar: true,
+       backgroundColor: blackColor,
+      appBar: AppBar(
+          toolbarHeight: 40,
+          forceMaterialTransparency: true,
+          backgroundColor: Colors.black,
+          leading: const SizedBox(),
+          leadingWidth: 0,
+          centerTitle: false,
+          title: Align(
+            alignment: Alignment.topLeft,
+            child: SvgPicture.asset(
+              "assets/icons/live.svg",
+              colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
+              width: 24,
+            ),
+          ),
+          
+          actions: [
+            ...homeAppBarItems.asMap().entries.map((entry) {
+              AppBarItem item = entry.value;
+              return TextButton(
+                onPressed: () => {},
+                child: Column(
+                  children: [
+                    Text(item.text,
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 15,
+                            fontWeight: item.isSelected
+                                ? FontWeight.bold
+                                : FontWeight.normal)),
+                    item.isSelected
+                        ? Container(height: 2, width: 30, color: Colors.white)
+                        : SizedBox(height: 2)
+                  ],
+                ),
+              );
+            }),
+            Align(
+              alignment: Alignment.topCenter,
+              child: IconButton(
+                onPressed: () {
+                  // Navigator.pushNamed(context, searchScreenRoute);
+                },
+                icon: SvgPicture.asset(
+                  "assets/icons/search.svg",
+                  height: 24,
+                  colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
                 ),
               ),
-            ),
-          )
-        ]),
-      );
-    }
+            )
+          ],
+        ),
+        body: RefreshIndicator(
+            onRefresh: refreshPage,
+            child: PageView.builder(
+              controller: _pageController,
+              scrollDirection: Axis.vertical, // vertical scroll
+              itemCount: posts.length,
+              onPageChanged: (index) {
+                setState(() {
+                  currentPage = index;
+                });
 
-    buildLikeButton(isLiked) {
-      return Icon(Icons.favorite,
-          size: 32, color: isLiked ? Colors.red : Colors.white);
-    }
+                // Kiểm tra xem người dùng đã gần đến cuối danh sách chưa
+                if (index == posts.length - 1) {
+                  print("loder mode...");
+                  loadMoreVideos(); // Tải thêm video
+                }
+              },
 
-    buildBookmarkButton(isMarked) {
-      return Icon(
-        Icons.bookmark,
-        size: 32,
-        color: isMarked ? Colors.orange : Colors.white,
-      );
-    }
-
-    genCount(count) {
-      return Text(count.toString(),
-          style: TextStyle(
-              color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold));
-    }
-
-    Future<bool> handleLikeTap(_isLiked) {
-      setState(() {
-        isLiked = !_isLiked;
-        likeCount = _isLiked ? likeCount - 1 : likeCount + 1;
-      });
-      return Future.value(!_isLiked);
-    }
-
-    Future<bool> handleMarkTap(_isMarked) {
-      setState(() {
-        isMarked = !_isMarked;
-        markCount = _isMarked ? markCount - 1 : markCount + 1;
-      });
-      return Future.value(!_isMarked);
-    }
-
-    void showComment() {
-      showModalBottomSheet(context: context, builder: (ctx) => CommentScreen());
-    }
-
-    return Scaffold(
-      body: Stack(
-        children: [
-          Container(
-              color: Colors.black,
-              child: Stack(
-                alignment: AlignmentDirectional.center,
-                children: [
-                  Align(
-                    alignment: Alignment.topCenter,
-                    child: Image.asset(
-                      "assets/images/flutter.png",
-                      fit: BoxFit.cover,
-                      height: MediaQuery.of(context).size.height,
-                      width: double.infinity,
-                    ),
-                  ),
-                  Container(
-                    color: Colors.black.withOpacity(0.1),
-                  ),
-                  Align(
-                      alignment: Alignment.bottomRight,
-                      widthFactor: 40,
-                      child: Padding(
-                          padding: const EdgeInsets.all(defaultPadding / 4),
-                          child: Container(
-                              width: 60,
-                              color: Colors.transparent,
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Column(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      Stack(children: [
-                                        buildProfile(size: 60),
-                                        Positioned(
-                                            right: 0,
-                                            left: 0,
-                                            bottom: 0,
-                                            child: Align(
-                                              alignment: Alignment.center,
-                                              child: Container(
-                                                  padding:
-                                                      const EdgeInsets.all(4),
-                                                  decoration:
-                                                      const BoxDecoration(
-                                                    color: Colors.red,
-                                                    shape: BoxShape.circle,
-                                                  ),
-                                                  child: svgIcon(
-                                                      "assets/icons/plus.svg",
-                                                      color: Colors.white,
-                                                      height: 12)),
-                                            )),
-                                      ]),
-                                      const SizedBox(
-                                        height: defaultPadding,
-                                      ),
-                                      LikeButton(
-                                        size: 30,
-                                        isLiked: isLiked,
-                                        likeBuilder: (_isLiked) =>
-                                            buildLikeButton(_isLiked),
-                                        onTap: (_isLiked) =>
-                                            handleLikeTap(_isLiked),
-                                      ),
-                                      const SizedBox(
-                                          height: defaultPadding / 8),
-                                      genCount(likeCount),
-                                      const SizedBox(
-                                        height: defaultPadding,
-                                      ),
-                                      LikeButton(
-                                        size: 30,
-                                        isLiked: isMarked,
-                                        likeBuilder: (_isMarked) =>
-                                            buildBookmarkButton(_isMarked),
-                                        onTap: (_isMarked) =>
-                                            handleMarkTap(_isMarked),
-                                      ),
-                                      const SizedBox(
-                                          height: defaultPadding / 8),
-                                      genCount(markCount),
-                                      const SizedBox(height: defaultPadding),
-                                      InkWell(
-                                        onTap: showComment,
-                                        child: svgIcon(
-                                            "assets/icons/comment.svg",
-                                            color: Colors.white),
-                                      ),
-                                      const SizedBox(
-                                          height: defaultPadding / 8),
-                                      genCount(commentCount),
-                                      const SizedBox(height: defaultPadding),
-                                      InkWell(
-                                        onTap: () => {},
-                                        child: svgIcon("assets/icons/share.svg",
-                                            color: Colors.white),
-                                      ),
-                                      const SizedBox(
-                                          height: defaultPadding / 8),
-                                      genCount(shareCount),
-                                      const SizedBox(height: defaultPadding),
-                                      buildProfile(size: 48)
-                                    ],
-                                  ),
-                                ],
-                              )))),
-                  Positioned(
-                      left: 0,
-                      right: 0,
-                      bottom: 0,
-                      child: Padding(
-                        padding: EdgeInsets.only(
-                            left: defaultPadding / 2,
-                            bottom: defaultPadding / 2,
-                            right: 120),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "T11N",
-                              style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white),
-                            ),
-                            Text(
-                                "Phần 1 | Tự học code flutter #flutter  #coder",
-                                style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white))
-                          ],
-                        ),
-                      ))
-                ],
-              )),
-        ],
-      ),
-    );
+              itemBuilder: (context, index) {
+                return VideoPost(post: posts[index]);
+              },
+            )));
   }
 }

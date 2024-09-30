@@ -51,7 +51,7 @@ class NonAuthScreen extends StatelessWidget {
                 backgroundColor: Colors.pink,
                 minimumSize: Size(160, 40)),
             child: Text(
-              "Register",
+              "Login",
               style: TextStyle(color: Colors.white, fontSize: 14),
             ),
           )

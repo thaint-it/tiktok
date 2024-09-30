@@ -21,7 +21,7 @@ void main() async {
   if (user != null) {
     userProvider.setUser(UserData(
         id: user.id,
-        userId: user.userId,
+        tiktokId: user.tiktokId,
         avatar: user.avatar,
         username: user.username,
         email: user.email));

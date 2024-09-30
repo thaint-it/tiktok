@@ -29,9 +29,15 @@ dependencies:
   freezed: ^2.5.7
   flutter_bloc: ^8.1.6
   image_picker: ^1.1.2
-  video_player: ^2.9.1
   image_cropper: ^8.0.2
   image: ^4.2.0
+  video_thumbnail: ^0.5.3
+  chewie: ^1.8.5
+  video_player: ^2.9.1
+  http: ^1.2.2
+  permission_handler: ^11.3.1
+  web_socket_channel: ^3.0.1
+  swipeable_page_route: ^0.4.4
 
 dev_dependencies:
   flutter_test:
@@ -48,11 +54,14 @@ flutter:
   - assets/icons/
   - assets/avatars/
   - assets/posts/
+  - assets/videos/
   fonts:
     - family: Tiktok
       fonts:
         - asset: assets/fonts/tiktok/TikTokText-Regular.otf
         - asset:  assets/fonts/tiktok/TikTokText-Medium.otf
         - asset:  assets/fonts/tiktok/TikTokText-Bold.otf
-          style: italic
+        - asset: assets/fonts/tiktok/TikTokDisplay-Regular.otf
+        - asset:  assets/fonts/tiktok/TikTokDisplay-Medium.otf
+        - asset:  assets/fonts/tiktok/TikTokDisplay-Bold.otf
         

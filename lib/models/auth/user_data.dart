@@ -1,7 +1,7 @@
 class UserData {
   UserData(
       {this.id,
-      this.userId,
+      this.tiktokId,
       this.username,
       this.email,
       this.avatar,
@@ -10,7 +10,7 @@ class UserData {
   int? id;
   String? avatar;
   String? username;
-  String? userId;
+  String? tiktokId;
   String? email;
   String? bio;
   DateTime? birthDate;

@@ -15,7 +15,6 @@ class AuthorizationInterceptor extends Interceptor {
       RequestOptions options, RequestInterceptorHandler handler) async {
     String? token = await _storageService.getToken();
     if (_needAuthorizationHeader(options) && token != null) {
-      print("token ${options.uri.path}");
       options.headers['Authorization'] = 'Bearer $token';
     }
     super.onRequest(options, handler);

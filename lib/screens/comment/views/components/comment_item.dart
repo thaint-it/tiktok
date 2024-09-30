@@ -3,20 +3,20 @@
 import 'package:flutter/material.dart';
 import 'package:tiktok_clone/components/avatar.dart';
 import 'package:tiktok_clone/constants.dart';
-import 'package:tiktok_clone/models/comment/comment_data.dart';
+import 'package:tiktok_clone/models/comment/comment.dart';
 
 class CommentItem extends StatefulWidget {
   const CommentItem({super.key, required this.comment});
-  final CommentData comment;
+  final Comment comment;
 
   @override
   State<CommentItem> createState() => _CommentItemState();
 }
 
 class _CommentItemState extends State<CommentItem> {
-  buildComment(CommentData comment, isRoot) {
+  buildComment(Comment comment, isRoot) {
     return Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Avatar(size: isRoot ? 24 : 16, url: comment.avatar),
+      Avatar(size: isRoot ? 24 : 16, url: ""),
       const SizedBox(
         width: defaultPadding / 2,
       ),
@@ -28,7 +28,7 @@ class _CommentItemState extends State<CommentItem> {
           Row(
             children: [
               Text(
-                comment.userName,
+                "",
                 style:
                     TextStyle(fontWeight: FontWeight.bold, color: blackColor80),
               ),
@@ -48,7 +48,7 @@ class _CommentItemState extends State<CommentItem> {
           //user name
 
           const SizedBox(height: defaultPadding / 4),
-          Text(comment.content),
+          Text(comment.content!),
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
@@ -73,13 +73,13 @@ class _CommentItemState extends State<CommentItem> {
                   color: Colors.white,
                   child: Column(
                     children: [
-                      ...widget.comment.children
-                          .asMap()
-                          .entries
-                          .map((entry) {
-                        CommentData childComment = entry.value;
-                        return buildComment(childComment, false);
-                      })
+                      // ...widget.comment.children
+                      //     .asMap()
+                      //     .entries
+                      //     .map((entry) {
+                      //   Comment childComment = entry.value;
+                      //   return buildComment(childComment, false);
+                      // })
                     ],
                   ),
                 )

@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:tiktok_clone/constants.dart';
 import 'package:tiktok_clone/models/comment/comment.dart';
-import 'package:tiktok_clone/models/comment/comment_data.dart';
 import 'package:tiktok_clone/screens/comment/views/components/comment_item.dart';
 
 class CommentScreen extends StatefulWidget {
@@ -15,7 +14,7 @@ class CommentScreen extends StatefulWidget {
 }
 
 class _CommentScreenState extends State<CommentScreen> {
-  List<CommentData> comments = [
+  List<Comment> comments = [
     // CommentData(
     //     id: 1,
     //     content: "này cực với vất vả lắm cố gắng với đam mê nhé bạn",
@@ -233,7 +232,7 @@ class _CommentScreenState extends State<CommentScreen> {
                   child: Column(
                     children: [
                       ...comments.asMap().entries.map((entry) {
-                        CommentData comment = entry.value;
+                        Comment comment = entry.value;
                         return CommentItem(comment: comment);
                       })
                     ],

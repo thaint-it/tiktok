@@ -87,7 +87,7 @@ class _LoginScreenState extends State<LoginScreen> {
           final user = response.user;
           userProvider.setUser(UserData(
               id: user.id,
-              userId: user.userId,
+              tiktokId: user.tiktokId,
               email: user.email,
               username: user.username,
               avatar: user.avatar));
@@ -113,7 +113,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 const BottomSheetHeader(),
                 const SizedBox(height: defaultPadding * 3),
                 Text(
-                  "Sign Up",
+                  "Login",
                   style: TextStyle(
                       color: blackColor,
                       fontWeight: FontWeight.bold,
@@ -171,7 +171,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             backgroundColor: Colors.pink,
                             minimumSize: Size(double.infinity, 40)),
                         child: Text(
-                          "Register",
+                          "Login",
                           style: TextStyle(color: Colors.white, fontSize: 14),
                         ),
                       )

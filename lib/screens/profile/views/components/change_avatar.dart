@@ -6,7 +6,6 @@ import 'package:tiktok_clone/api/auth.dart';
 import 'package:tiktok_clone/constants.dart';
 import 'package:tiktok_clone/injections/injection.dart';
 import 'package:tiktok_clone/models/auth/user.dart';
-import 'package:tiktok_clone/models/auth/user_data.dart';
 import 'package:tiktok_clone/providers/user_data_provider.dart';
 import 'package:tiktok_clone/storage/storage.dart';
 
@@ -34,7 +33,7 @@ class _CropAvatarState extends State<CropAvatar> {
           _storageService.setUser(User(
               id: user.id,
               avatar: user.avatar,
-              userId: user.userId,
+              tiktokId: user.tiktokId,
               email: user.email,
               username: user.username,
               bio: user.bio));

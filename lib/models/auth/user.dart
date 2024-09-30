@@ -11,19 +11,22 @@ class User extends Equatable {
   final int? id;
   final String? avatar;
   final String? username;
-  @JsonKey(name: 'user_id') // Maps 'user_id' from JSON to 'userId'
-  final String? userId;
+  @JsonKey(name: 'tiktok_id') // Maps 'user_id' from JSON to 'userId'
+  final String? tiktokId;
   final String? email;
   final String? bio;
+   @JsonKey(name: 'first_name') 
+  final String? firstName;
+  final String? system;
 
   User(
-      {this.id, this.avatar, this.username, this.userId, this.email, this.bio});
+      {this.id, this.avatar, this.username, this.tiktokId, this.email, this.bio,this.firstName, this.system});
 
   @override
   bool? get stringify => true;
 
   @override
-  List<Object?> get props => [id, avatar, username, userId, email, bio];
+  List<Object?> get props => [id, avatar, username, tiktokId, email, bio,firstName,system];
   factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
   Map<String, dynamic> toJson() => _$UserToJson(this);
 }
