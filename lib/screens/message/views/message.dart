@@ -11,6 +11,7 @@ import 'package:tiktok_clone/constants.dart';
 import 'package:tiktok_clone/injections/injection.dart';
 import 'package:tiktok_clone/models/auth/user.dart';
 import 'package:tiktok_clone/models/message/message.dart';
+import 'package:tiktok_clone/providers/message_provider.dart';
 import 'package:tiktok_clone/providers/user_data_provider.dart';
 import 'package:tiktok_clone/screens/message/views/components/user-online.dart';
 import 'package:tiktok_clone/screens/message/views/detail_message.dart';
@@ -31,14 +32,13 @@ class _MessageScreenState extends State<MessageScreen> {
         user: User(username: "Activity"),
         content: "Cristiano Ronaldo liked your video."),
   ];
-  List<User> users = [];
   AuthService authService = getIt<AuthService>();
   Future<void> fetchData() async {
     try {
       final response = await authService.fetchUsers();
-      setState(() {
-        users = response!;
-      });
+      MessageProvider messageProvider =
+          Provider.of<MessageProvider>(context, listen: false);
+      messageProvider.setUser(response);
     } catch (e) {
       throw e.toString();
     }
@@ -54,6 +54,8 @@ class _MessageScreenState extends State<MessageScreen> {
   @override
   Widget build(BuildContext context) {
     final userProvider = Provider.of<UserProvider>(context);
+    final messageProvider = Provider.of<MessageProvider>(context);
+    final users = messageProvider.users;
 
     return Scaffold(
         appBar: AppBar(
@@ -107,7 +109,7 @@ class _MessageScreenState extends State<MessageScreen> {
               height: 150,
               padding: const EdgeInsets.symmetric(
                   horizontal: defaultPadding, vertical: defaultPadding),
-              child: UserOnline(user: userProvider.user!, users: users),
+              child: UserOnline(),
             )),
             SliverToBoxAdapter(
                 child: Padding(
@@ -115,10 +117,16 @@ class _MessageScreenState extends State<MessageScreen> {
                         const EdgeInsets.symmetric(horizontal: defaultPadding),
                     child: Column(
                       children: [
-                        ...users.asMap().entries.where((entry)=>entry.value.id!=userProvider.user!.id).map((entry) {
-                          final item = entry.value;
-                          final index=entry.key;
-                          return Padding(
+                        if (users != null)
+                          ...users
+                              .asMap()
+                              .entries
+                              .where((entry) =>
+                                  entry.value.id != userProvider.user!.id)
+                              .map((entry) {
+                            final item = entry.value;
+                            final index = entry.key;
+                            return Padding(
                               padding: const EdgeInsets.symmetric(
                                   vertical: defaultPadding / 2),
                               child: InkWell(
@@ -132,11 +140,20 @@ class _MessageScreenState extends State<MessageScreen> {
                                       },
                                   child: Row(
                                     children: [
-                                      Avatar(
-                                        size: 28,
-                                        url: item.avatar,
-                                        name: item.username,
-                                        isNetwork:true,
+                                      Stack(
+                                        children: [
+                                          Avatar(
+                                            size: 28,
+                                            url: item.avatar,
+                                            name: item.username,
+                                            isNetwork: true,
+                                          ),
+                                          if (item.isOnline == true)
+                                            Positioned(
+                                                right: 0,
+                                                bottom: 2,
+                                                child: Cirlce(size: 16))
+                                        ],
                                       ),
                                       const SizedBox(width: defaultPadding),
                                       Expanded(
@@ -156,19 +173,20 @@ class _MessageScreenState extends State<MessageScreen> {
                                             height: defaultPadding / 8,
                                           ),
                                           Text(
-                                            "${item.firstName} ${index%2==0?"started following you.":"liked your video."}",
+                                            "${item.firstName} ${index % 2 == 0 ? "started following you." : "liked your video."}",
                                             overflow: TextOverflow.ellipsis,
-                                          )
+                                          ),
                                         ],
                                       )),
                                       Icon(
                                         Icons.arrow_forward_ios_outlined,
                                         size: 18,
-                                        color: Colors.black,
+                                        color: Colors.black54,
                                       ),
                                     ],
-                                  )));
-                        })
+                                  )),
+                            );
+                          })
                       ],
                     ))),
           ],

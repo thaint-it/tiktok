@@ -13,9 +13,6 @@ User _$UserFromJson(Map<String, dynamic> json) => User(
       tiktokId: json['tiktok_id'] as String?,
       email: json['email'] as String?,
       bio: json['bio'] as String?,
-      firstName: json['first_name'] as String?,
-      system: json['system'] as String?,
-      isOnline: json['is_online'] as bool?,
     );
 
 Map<String, dynamic> _$UserToJson(User instance) => <String, dynamic>{
@@ -25,9 +22,6 @@ Map<String, dynamic> _$UserToJson(User instance) => <String, dynamic>{
       'tiktok_id': instance.tiktokId,
       'email': instance.email,
       'bio': instance.bio,
-      'first_name': instance.firstName,
-      'system': instance.system,
-      'is_online': instance.isOnline,
     };
 
 UserResponse _$UserResponseFromJson(Map<String, dynamic> json) => UserResponse(

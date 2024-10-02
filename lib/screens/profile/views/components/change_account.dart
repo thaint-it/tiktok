@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:tiktok_clone/components/avatar.dart';
 import 'package:tiktok_clone/constants.dart';
 import 'package:tiktok_clone/injections/injection.dart';
+import 'package:tiktok_clone/providers/message_provider.dart';
 import 'package:tiktok_clone/providers/user_data_provider.dart';
 import 'package:tiktok_clone/screens/auth/views/login.dart';
 import 'package:tiktok_clone/storage/storage.dart';
@@ -24,6 +25,18 @@ class _ChangeAccountState extends State<ChangeAccount> {
         builder: (ctx) => LoginScreen(),
         isScrollControlled: true,
         useSafeArea: true);
+  }
+
+  void signOut() {
+    if (mounted) {
+      final messageProvider =
+          Provider.of<MessageProvider>(context, listen: false);
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+      storageService.clearSharedPreferences();
+      userProvider.setUser(null);
+      messageProvider.channel!.sink.close();
+      Navigator.of(context).pop();
+    }
   }
 
   @override
@@ -119,12 +132,8 @@ class _ChangeAccountState extends State<ChangeAccount> {
                           ],
                         )),
                     const SizedBox(height: defaultPadding * 2),
-                     TextButton(
-                        onPressed: () => {
-                              storageService.clearSharedPreferences(),
-                              userProvider.setUser(null),
-                              Navigator.of(context).pop()
-                            },
+                    TextButton(
+                        onPressed: signOut,
                         child: Row(
                           children: [
                             Icon(

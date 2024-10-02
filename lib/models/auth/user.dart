@@ -1,6 +1,8 @@
 // https://github.com/thecodexhub/flutter-dio-example/blob/main/lib/models/user.dart
 // flutter pub run build_runner build -delete-confilicting-outputs
 
+import 'dart:ffi';
+
 import 'package:json_annotation/json_annotation.dart';
 import 'package:equatable/equatable.dart';
 
@@ -18,15 +20,17 @@ class User extends Equatable {
    @JsonKey(name: 'first_name') 
   final String? firstName;
   final String? system;
+  @JsonKey(name: 'is_online') 
+  bool? isOnline;
 
   User(
-      {this.id, this.avatar, this.username, this.tiktokId, this.email, this.bio,this.firstName, this.system});
+      {this.id, this.avatar, this.username, this.tiktokId, this.email, this.bio,this.firstName, this.system, this.isOnline});
 
   @override
   bool? get stringify => true;
 
   @override
-  List<Object?> get props => [id, avatar, username, tiktokId, email, bio,firstName,system];
+  List<Object?> get props => [id, avatar, username, tiktokId, email, bio,firstName,system,isOnline];
   factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
   Map<String, dynamic> toJson() => _$UserToJson(this);
 }

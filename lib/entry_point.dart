@@ -11,6 +11,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:animations/animations.dart';
 import 'package:tiktok_clone/injections/injection.dart';
 import 'package:tiktok_clone/models/auth/user.dart';
+import 'package:tiktok_clone/providers/message_provider.dart';
 import 'package:tiktok_clone/providers/user_data_provider.dart';
 import 'package:tiktok_clone/screens/auth/views/non_auth.dart';
 import 'package:tiktok_clone/screens/message/views/message.dart';
@@ -41,20 +42,32 @@ class _EntryPointScreenState extends State<EntryPointScreen> {
   WebSocketChannel? channel;
   StorageService storageService = getIt<StorageService>();
   int unreadMessage = 10;
-  Future<void> initData() async {
+
+  UserProvider? userProvider;
+
+  Future<void> initSignal() async {
     User? user = await storageService.getUser();
-    print('user$user');
     if (user != null) {
+      print("init signal ${user.id}");
       channel = WebSocketChannel.connect(
         Uri.parse(
             'ws://${Endpoints.socketURL}/ws/messages/${user.id}/'), // Update with your server URL
       );
-      print("channel $channel");
+      // Lấy messageProvider mà không lắng nghe thay đổi
+      final messageProvider =
+          Provider.of<MessageProvider>(context, listen: false);
+      messageProvider.setChannel(channel = channel);
       channel!.stream.listen((message) {
-        print("recieve new message");
         // // Handle incoming messages
         final data = jsonDecode(message);
-        print('New message: ${data['message']}');
+        print("recieve new message $data");
+
+        final users = messageProvider.users;
+        if (users != null &&
+            (data['type'] == "CONNECTED" || data['type'] == "DISCONNECTED")) {
+          messageProvider.updateUserOnlineStatus(
+              data['id'], data['type'] == "CONNECTED");
+        }
         // You can also update your UI here
       });
     }
@@ -63,7 +76,11 @@ class _EntryPointScreenState extends State<EntryPointScreen> {
   @override
   void initState() {
     super.initState();
-    initData();
+    initSignal();
+    userProvider = Provider.of<UserProvider>(context, listen: false);
+    userProvider!.watchUserChange((newUser) {
+      initSignal();
+    });
   }
 
   @override
@@ -206,7 +223,7 @@ class _EntryPointScreenState extends State<EntryPointScreen> {
                   // icon: svgIcon("assets/icons/chat.svg",
                   //     color: appBarIconColor()),
                   icon: Stack(
-                    clipBehavior: Clip.none, 
+                    clipBehavior: Clip.none,
                     children: [
                       svgIcon("assets/icons/chat.svg",
                           color: appBarIconColor()),
@@ -215,22 +232,18 @@ class _EntryPointScreenState extends State<EntryPointScreen> {
                           right: -10,
                           top: -10,
                           child: Container(
-                            padding: EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 4, vertical: 1),
                             decoration: BoxDecoration(
-                              color: Colors.red,
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            constraints: BoxConstraints(
-                              minWidth: 12,
-                              minHeight: 10,
-                            ),
+                                color: Colors.red,
+                                borderRadius: BorderRadius.circular(8)),
+                            constraints:
+                                BoxConstraints(minWidth: 12, minHeight: 10),
                             child: Center(
                               child: Text(
                                 unreadMessage.toString(),
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 12,
-                                ),
+                                style:
+                                    TextStyle(color: whiteColor, fontSize: 12),
                               ),
                             ),
                           ),

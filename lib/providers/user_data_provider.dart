@@ -10,4 +10,13 @@ class UserProvider with ChangeNotifier {
     _user = newUser;
     notifyListeners();
   }
+
+  // Method to watch changes
+  void watchUserChange(Function(UserData?) callback) {
+    // This method will invoke the callback with the new user data whenever setUser is called.
+    callback(_user);
+    addListener(() {
+      callback(_user);
+    });
+  }
 }

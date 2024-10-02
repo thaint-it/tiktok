@@ -1,6 +1,7 @@
 import 'package:provider/provider.dart';
 import 'package:tiktok_clone/injections/injection.dart';
 import 'package:tiktok_clone/models/auth/user_data.dart';
+import 'package:tiktok_clone/providers/message_provider.dart';
 import 'package:tiktok_clone/providers/user_data_provider.dart';
 import 'package:tiktok_clone/route/route_constants.dart';
 import 'package:tiktok_clone/storage/storage.dart';
@@ -15,6 +16,7 @@ void main() async {
   StorageService storageService = getIt<StorageService>();
 
   UserProvider userProvider = UserProvider();
+  MessageProvider messageProvider=MessageProvider();
 
   // Fetch user data from SharedPreferences and initialize UserProvider
   final user = await storageService.getUser();
@@ -31,6 +33,7 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => userProvider),
+        ChangeNotifierProvider(create: (_) => messageProvider),
         // Thêm các provider khác ở đây
       ],
       child: MyApp(),

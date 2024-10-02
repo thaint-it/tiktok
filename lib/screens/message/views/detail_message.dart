@@ -90,7 +90,6 @@ class _DetailMessageScreenState extends State<DetailMessageScreen> {
                 },
                 icon: Icon(
                   Icons.flag_outlined,
-                  size: 24,
                   color: blackColor,
                 )),
             IconButton(
@@ -99,7 +98,6 @@ class _DetailMessageScreenState extends State<DetailMessageScreen> {
                 },
                 icon: Icon(
                   Icons.more_horiz_outlined,
-                  size: 24,
                   color: blackColor,
                 ))
           ],
@@ -143,7 +141,9 @@ class _DetailMessageScreenState extends State<DetailMessageScreen> {
                         buildTag(Icons.tag_faces_sharp, "", Colors.deepOrange),
                       ],
                     ),
-                    const SizedBox(height: defaultPadding/2,),
+                    const SizedBox(
+                      height: defaultPadding / 2,
+                    ),
                     Container(
                       padding: const EdgeInsets.symmetric(
                           horizontal: defaultPadding / 2,
@@ -154,17 +154,14 @@ class _DetailMessageScreenState extends State<DetailMessageScreen> {
                       child: Row(
                         children: [
                           Container(
-                            width:
-                                32, // Width and height should be the same for a circle
+                            width: 32,
                             height: 32,
                             decoration: BoxDecoration(
-                              color:
-                                  Colors.lightBlue.shade400, // Background color
-                              shape: BoxShape.circle, // Circle shape
-                            ),
+                                color: Colors.lightBlueAccent.shade400,
+                                shape: BoxShape.circle),
                             child: Center(
                               child: Text(
-                                'A',
+                                "A",
                                 style: TextStyle(
                                     color: Colors.white,
                                     fontSize: 16,

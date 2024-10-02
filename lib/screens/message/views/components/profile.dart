@@ -31,7 +31,7 @@ class MessageProfile extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(
                         vertical: 0, horizontal: defaultPadding),
                     shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(2)),
+                      borderRadius: BorderRadius.all(Radius.circular(20)),
                     ),
                     backgroundColor: Colors.pink,
                     minimumSize: Size(100, 30)),

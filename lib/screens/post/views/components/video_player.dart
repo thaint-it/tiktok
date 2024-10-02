@@ -17,7 +17,7 @@ class _TiktokVideoPlayerState extends State<TiktokVideoPlayer> {
   void initState() {
     super.initState();
     // Initialize the VideoPlayerController with the video URL
-    _controller = VideoPlayerController.asset(widget.videoUrl);
+    _controller = VideoPlayerController.asset("assets/videos/d5649e78-35a0-4e67-a99f-abd41462755f.mp4");
     // Initialize the controller and store the Future for later use
     // Optionally set the controller to loop
     // _controller.addListener(() {
