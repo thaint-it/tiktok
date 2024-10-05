@@ -116,6 +116,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                   children: [
                     Expanded(
                       child: TextField(
+                        autofocus: false,
                         controller:
                             descrioptionController, // Bind the controller to this field
                         maxLines: null, // Allow multiple lines

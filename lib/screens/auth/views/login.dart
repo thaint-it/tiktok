@@ -124,6 +124,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     key: formKey,
                     child: Column(children: [
                       TextFormField(
+                        autofocus: false,
                         controller: emailController,
                         decoration: InputDecoration(
                           hintText: "Email or TikTok ID",
@@ -143,6 +144,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         height: defaultPadding,
                       ),
                       TextFormField(
+                        autofocus: false,
                         controller: passwordController,
                         decoration: InputDecoration(
                           hintText: "Password",

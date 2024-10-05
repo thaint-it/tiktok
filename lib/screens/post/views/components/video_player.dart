@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:tiktok_clone/api/enpoints.dart';
 import 'package:tiktok_clone/constants.dart';
+import 'package:tiktok_clone/utils/utils.dart';
 import 'package:video_player/video_player.dart';
 
 class TiktokVideoPlayer extends StatefulWidget {
@@ -17,7 +19,7 @@ class _TiktokVideoPlayerState extends State<TiktokVideoPlayer> {
   void initState() {
     super.initState();
     // Initialize the VideoPlayerController with the video URL
-    _controller = VideoPlayerController.asset("assets/videos/d5649e78-35a0-4e67-a99f-abd41462755f.mp4");
+    _controller = VideoPlayerController.asset(Utils.getUrl(widget.videoUrl));
     // Initialize the controller and store the Future for later use
     // Optionally set the controller to loop
     // _controller.addListener(() {

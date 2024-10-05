@@ -26,10 +26,10 @@ class MessageScreen extends StatefulWidget {
 class _MessageScreenState extends State<MessageScreen> {
   List<Message> messages = [
     Message(
-        user: User(username: "New followers"),
+        fromUser: User(username: "New followers"),
         content: "Rooney started following you."),
     Message(
-        user: User(username: "Activity"),
+        fromUser: User(username: "Activity"),
         content: "Cristiano Ronaldo liked your video."),
   ];
   AuthService authService = getIt<AuthService>();

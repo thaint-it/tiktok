@@ -51,7 +51,7 @@ class _EntryPointScreenState extends State<EntryPointScreen> {
       print("init signal ${user.id}");
       channel = WebSocketChannel.connect(
         Uri.parse(
-            'ws://${Endpoints.socketURL}/ws/messages/${user.id}/'), // Update with your server URL
+            'ws://${Endpoints.socketURL}/ws/notification/${user.id}/'), // Update with your server URL
       );
       // Lấy messageProvider mà không lắng nghe thay đổi
       final messageProvider =
@@ -71,11 +71,14 @@ class _EntryPointScreenState extends State<EntryPointScreen> {
         // You can also update your UI here
       });
     }
+    FocusScope.of(context).unfocus();
   }
 
   @override
   void initState() {
+    // This will hide the keyboard
     super.initState();
+
     initSignal();
     userProvider = Provider.of<UserProvider>(context, listen: false);
     userProvider!.watchUserChange((newUser) {
@@ -130,6 +133,7 @@ class _EntryPointScreenState extends State<EntryPointScreen> {
 
   @override
   Widget build(BuildContext context) {
+
     final userProvider = Provider.of<UserProvider>(context);
 
     if (userProvider.user == null) {

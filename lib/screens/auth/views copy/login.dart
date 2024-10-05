@@ -87,7 +87,7 @@ class _LoginScreenState extends State<LoginScreen> {
           final user = response.user;
           userProvider.setUser(UserData(
               id: user.id,
-              userId: user.userId,
+              tiktokId: user.tiktokId,
               email: user.email,
               username: user.username,
               avatar: user.avatar));

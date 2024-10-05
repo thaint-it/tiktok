@@ -8,6 +8,7 @@ class MessageProvider with ChangeNotifier {
 
   List<User>? get users => _users;
   WebSocketChannel? get channel => _channel;
+  
 
   void setUser(List<User>? newUsers) {
     _users = newUsers;
