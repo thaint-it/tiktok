@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:tiktok_clone/api/auth.dart';
 import 'package:tiktok_clone/api/enpoints.dart';
 import 'package:tiktok_clone/components/custom_icon.dart';
 import 'package:tiktok_clone/constants.dart';
@@ -41,6 +42,7 @@ class _EntryPointScreenState extends State<EntryPointScreen> {
   final ImagePicker _picker = ImagePicker();
   WebSocketChannel? channel;
   StorageService storageService = getIt<StorageService>();
+  AuthService authService = getIt<AuthService>();
   int unreadMessage = 10;
 
   UserProvider? userProvider;
@@ -68,18 +70,28 @@ class _EntryPointScreenState extends State<EntryPointScreen> {
           messageProvider.updateUserOnlineStatus(
               data['id'], data['type'] == "CONNECTED");
         }
+        if ((data['type'] == "LIKE" || data['type'] == "FAVORITE")) {
+          final notifyCount=messageProvider.notifyCount;
+          messageProvider.setNotifyCount(notifyCount + 1);
+        }
         // You can also update your UI here
       });
     }
     FocusScope.of(context).unfocus();
   }
 
+  Future<void> getNofifyCount() async {
+    final count = await authService.notifyCount();
+    final messageProvider =
+        Provider.of<MessageProvider>(context, listen: false);
+    messageProvider.setNotifyCount(count);
+  }
+
   @override
   void initState() {
     // This will hide the keyboard
     super.initState();
-
-    initSignal();
+    getNofifyCount();
     userProvider = Provider.of<UserProvider>(context, listen: false);
     userProvider!.watchUserChange((newUser) {
       initSignal();
@@ -133,8 +145,8 @@ class _EntryPointScreenState extends State<EntryPointScreen> {
 
   @override
   Widget build(BuildContext context) {
-
     final userProvider = Provider.of<UserProvider>(context);
+    final ms = Provider.of<MessageProvider>(context);
 
     if (userProvider.user == null) {
       _pages = [
@@ -200,7 +212,7 @@ class _EntryPointScreenState extends State<EntryPointScreen> {
                   setState(() {
                     selectedIndex = index;
                   });
-                } else {
+                } else if (index == 2) {
                   pickVideoFromGallery();
                 }
               },
@@ -231,7 +243,7 @@ class _EntryPointScreenState extends State<EntryPointScreen> {
                     children: [
                       svgIcon("assets/icons/chat.svg",
                           color: appBarIconColor()),
-                      if (unreadMessage > 0)
+                      if (ms.notifyCount > 0)
                         Positioned(
                           right: -10,
                           top: -10,
@@ -245,7 +257,7 @@ class _EntryPointScreenState extends State<EntryPointScreen> {
                                 BoxConstraints(minWidth: 12, minHeight: 10),
                             child: Center(
                               child: Text(
-                                unreadMessage.toString(),
+                                ms.notifyCount.toString(),
                                 style:
                                     TextStyle(color: whiteColor, fontSize: 12),
                               ),
@@ -254,8 +266,35 @@ class _EntryPointScreenState extends State<EntryPointScreen> {
                         ),
                     ],
                   ),
-                  activeIcon: svgIcon("assets/icons/chat.svg",
-                      color: appBarIconColor(isActive: true)),
+                  activeIcon: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      svgIcon("assets/icons/chat.svg",
+                          color: appBarIconColor(isActive: true)),
+                      if (ms.notifyCount > 0)
+                        Positioned(
+                          right: -10,
+                          top: -10,
+                          child: Container(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 4, vertical: 1),
+                            decoration: BoxDecoration(
+                                color: Colors.red,
+                                borderRadius: BorderRadius.circular(8)),
+                            constraints:
+                                BoxConstraints(minWidth: 12, minHeight: 10),
+                            child: Center(
+                              child: Text(
+                                ms.notifyCount.toString(),
+                                style:
+                                    TextStyle(color: whiteColor, fontSize: 12),
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+
                   label: "Hộp thư",
                 ),
                 BottomNavigationBarItem(

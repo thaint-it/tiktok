@@ -15,8 +15,10 @@ class Message {
   User? fromUser;
   @JsonKey(name: 'to_user')
   User? toUser;
+  @JsonKey(name: 'is_read')
   bool? isRead;
   bool? isSending;
+  Message? parent;
 
   Message(
       {this.id,
@@ -26,7 +28,8 @@ class Message {
       this.toUser,
       this.isRead,
       this.isSending,
-      this.createdAt});
+      this.createdAt,
+      this.parent});
 
   @override
   bool? get stringify => true;
@@ -41,6 +44,7 @@ class Message {
         toUser,
         isRead,
         isSending,
+        parent
       ];
   factory Message.fromJson(Map<String, dynamic> json) =>
       _$MessageFromJson(json);

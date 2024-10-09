@@ -2,10 +2,12 @@
 
 import 'package:http/http.dart';
 import 'package:tiktok_clone/api/enpoints.dart';
+import 'package:tiktok_clone/api/post.dart';
 import 'package:tiktok_clone/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:like_button/like_button.dart';
+import 'package:tiktok_clone/injections/injection.dart';
 import 'package:tiktok_clone/models/post/post.dart';
 import 'package:tiktok_clone/screens/comment/views/comment.dart';
 import 'package:tiktok_clone/screens/post/views/components/video_player.dart';
@@ -39,16 +41,18 @@ class _VideoPostState extends State<VideoPost> {
     AppBarItem(text: "Dành cho bạn", isSelected: true),
   ];
 
-@override
+  PostService postService = getIt<PostService>();
+
+  @override
   void initState() {
     // TODO: implement initState
     super.initState();
-   setState(() {
-    markCount=widget.post.favoriteCount!;
-    likeCount=widget.post.likeCount!;
-    shareCount=widget.post.shareCount!;
-    commentCount=widget.post.commentCount!;
-   });
+    setState(() {
+      markCount = widget.post.favoriteCount!;
+      likeCount = widget.post.likeCount!;
+      shareCount = widget.post.shareCount!;
+      commentCount = widget.post.commentCount!;
+    });
   }
 
   @override
@@ -82,7 +86,7 @@ class _VideoPostState extends State<VideoPost> {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(size / 2),
                 child: Image.network(
-              Utils.resolveUrl(Endpoints.baseURL, widget.post.user!.avatar),
+                  Utils.resolveUrl(Endpoints.baseURL, widget.post.user!.avatar),
                   fit: BoxFit.cover,
                 ),
               ),
@@ -112,6 +116,8 @@ class _VideoPostState extends State<VideoPost> {
     }
 
     Future<bool> handleLikeTap(_isLiked) {
+      final data = {"post_id": widget.post.id!};
+      postService.postActivity("LIKE", data);
       setState(() {
         isLiked = !_isLiked;
         likeCount = _isLiked ? likeCount - 1 : likeCount + 1;
@@ -120,6 +126,8 @@ class _VideoPostState extends State<VideoPost> {
     }
 
     Future<bool> handleMarkTap(_isMarked) {
+      final data = {"post_id": widget.post.id!};
+      postService.postActivity("FAVORITE", data);
       setState(() {
         isMarked = !_isMarked;
         markCount = _isMarked ? markCount - 1 : markCount + 1;
@@ -239,7 +247,7 @@ class _VideoPostState extends State<VideoPost> {
                     child: Padding(
                       padding: EdgeInsets.only(
                           left: defaultPadding / 2,
-                          bottom: defaultPadding*2,
+                          bottom: defaultPadding * 2,
                           right: 120),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,

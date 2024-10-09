@@ -16,11 +16,14 @@ Message _$MessageFromJson(Map<String, dynamic> json) => Message(
       toUser: json['to_user'] == null
           ? null
           : User.fromJson(json['to_user'] as Map<String, dynamic>),
-      isRead: json['isRead'] as bool?,
+      isRead: json['is_read'] as bool?,
       isSending: json['isSending'] as bool?,
       createdAt: json['created_at'] == null
           ? null
           : DateTime.parse(json['created_at'] as String),
+      parent: json['parent'] == null
+          ? null
+          : Message.fromJson(json['parent'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$MessageToJson(Message instance) => <String, dynamic>{
@@ -30,8 +33,9 @@ Map<String, dynamic> _$MessageToJson(Message instance) => <String, dynamic>{
       'created_at': instance.createdAt?.toIso8601String(),
       'from_user': instance.fromUser,
       'to_user': instance.toUser,
-      'isRead': instance.isRead,
+      'is_read': instance.isRead,
       'isSending': instance.isSending,
+      'parent': instance.parent,
     };
 
 MessagePagination _$MessagePaginationFromJson(Map<String, dynamic> json) =>

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:tiktok_clone/api/enpoints.dart';
 import 'package:tiktok_clone/api/message.dart';
@@ -37,6 +38,7 @@ class _DetailMessageScreenState extends State<DetailMessageScreen>
   final ScrollController scrollController = ScrollController();
   late final TextEditingController textController =
       TextEditingController(text: "");
+  late FocusNode focusNode;
 
   // Giả lập tải video ban đầu
   Future<void> fetchMessages() async {
@@ -64,15 +66,19 @@ class _DetailMessageScreenState extends State<DetailMessageScreen>
   }
 
   Future<void> sendMessage() async {
+    final parentMessage =
+        replyMessage && selectedMessage != null ? selectedMessage : null;
     final newMessage = Message(
         content: textController.text,
         toUser: widget.user,
         fromUser: currentUser!,
-        isSending: true);
+        isSending: true,
+        parent: parentMessage);
     textController.clear();
     setState(() {
       messages.add(newMessage);
     });
+    hideOverlay();
     FocusScope.of(context).unfocus(); // Hide keyboard
     // Unfocus and scroll after the frame has settled
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -82,7 +88,7 @@ class _DetailMessageScreenState extends State<DetailMessageScreen>
     await messageService.createMessage(data: {
       "content": newMessage.content,
       "to_user_id": newMessage.toUser!.id,
-      "parent_id": null
+      "parent_id": parentMessage?.id
     });
     // Sleep for 1 second
     await Future.delayed(Duration(seconds: 1));
@@ -107,18 +113,20 @@ class _DetailMessageScreenState extends State<DetailMessageScreen>
   }
 
   void scrollToBottom() {
-    // Animate to the bottom of the scroll view
-    scrollController.animateTo(
-      scrollController.position.maxScrollExtent,
-      duration: Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
-    );
+    if (scrollController != null) {
+// Animate to the bottom of the scroll view
+      scrollController.animateTo(
+        scrollController.position.maxScrollExtent,
+        duration: Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    }
   }
 
   @override
   void initState() {
     super.initState();
-
+    focusNode = FocusNode(); // Initialize the FocusNode
     WidgetsBinding.instance.addObserver(this);
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     currentUser = User(id: userProvider.user!.id);
@@ -145,6 +153,8 @@ class _DetailMessageScreenState extends State<DetailMessageScreen>
 
   @override
   void dispose() {
+    print("dispose");
+    focusNode.dispose(); // Dispose of the FocusNode when not needed
     WidgetsBinding.instance.removeObserver(this);
     scrollController.dispose(); // Dispose of the controller
     channel!.sink.close();
@@ -162,8 +172,82 @@ class _DetailMessageScreenState extends State<DetailMessageScreen>
 
     // Scroll to bottom after the keyboard is shown or hidden
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return; // Check if still mounted
       scrollToBottom();
     });
+  }
+
+  GlobalKey stackKey = GlobalKey();
+  GlobalKey? selectedMessageKey;
+  Offset? selectedMessagePosition;
+  Message? selectedMessage;
+  bool selectedMessageShowAvatar = false;
+  bool showAction = false;
+  bool replyMessage = false;
+
+  void showOverlay(Message message, GlobalKey key) {
+    // Lấy vị trí của tin nhắn được chọn
+    RenderBox renderBox = key.currentContext!.findRenderObject() as RenderBox;
+    Offset widgetPosition = renderBox.localToGlobal(Offset.zero);
+
+    // Calculate position relative to Stack
+    RenderBox stackRenderBox =
+        stackKey.currentContext!.findRenderObject() as RenderBox;
+    Offset stackPosition = stackRenderBox.localToGlobal(Offset.zero);
+
+    // Store the relative position
+    selectedMessagePosition = widgetPosition - stackPosition;
+    setState(() {
+      selectedMessage = message;
+      selectedMessageKey = key;
+      showAction = true;
+    });
+  }
+
+  void handleReplyMessage() {
+    setState(() {
+      showAction = false;
+      replyMessage = true;
+      focusNode.requestFocus();
+    });
+  }
+
+  void hideOverlay() {
+    setState(() {
+      showAction = false;
+      selectedMessage = null;
+      selectedMessageKey = null;
+      selectedMessagePosition = null;
+    });
+  }
+
+  genIcon(String icon, String label, VoidCallback callback,
+      {Color color = Colors.black}) {
+    return IconButton(
+        onPressed: callback,
+        icon: Column(
+          children: [
+            Container(
+                height: 48,
+                width: 48,
+                decoration:
+                    BoxDecoration(shape: BoxShape.circle, color: Colors.white),
+                child: Align(
+                    alignment: Alignment.center,
+                    child: SvgPicture.asset(icon,
+                        width: 24,
+                        height: 24,
+                        colorFilter:
+                            ColorFilter.mode(color, BlendMode.srcIn)))),
+            SizedBox(
+              height: defaultPadding / 8,
+            ),
+            Text(
+              label,
+              style: TextStyle(fontWeight: FontWeight.w500, color: color),
+            )
+          ],
+        ));
   }
 
   @override
@@ -263,7 +347,7 @@ class _DetailMessageScreenState extends State<DetailMessageScreen>
             ),
           ),
         ),
-        body: Stack(children: [
+        body: Stack(key: stackKey, children: [
           // Main content here
           Positioned.fill(
             child: Column(
@@ -279,6 +363,7 @@ class _DetailMessageScreenState extends State<DetailMessageScreen>
                         delegate: SliverChildBuilderDelegate(
                           (BuildContext context, int index) {
                             final message = messages[index];
+                            GlobalKey key = GlobalKey();
                             bool isMe = message.fromUser!.id == currentUser!.id;
                             bool showAvatar = !isMe &&
                                 (index == messages.length - 1 ||
@@ -297,77 +382,134 @@ class _DetailMessageScreenState extends State<DetailMessageScreen>
                                             0.75, // 75% of screen width
                                   ),
                                   child: Container(
-                                      margin: EdgeInsets.symmetric(
-                                          vertical: defaultPadding / 4,
-                                          horizontal: defaultPadding),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.end,
-                                        children: [
-                                          Row(
-                                              mainAxisAlignment: isMe
-                                                  ? MainAxisAlignment.end
-                                                  : MainAxisAlignment.start,
-                                              mainAxisSize: MainAxisSize.min,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                if (showAvatar)
-                                                  Avatar(
-                                                    size: 16,
-                                                    url: message
-                                                        .fromUser!.avatar,
-                                                    isNetwork: true,
-                                                    name: message
-                                                        .fromUser!.tiktokId,
-                                                  ),
-                                                const SizedBox(
-                                                  width: defaultPadding / 2,
-                                                ),
-                                                Flexible(
-                                                  child: Container(
-                                                    padding: EdgeInsets.all(10),
-                                                    margin: EdgeInsets.only(
-                                                        left: !showAvatar
-                                                            ? 24 +
-                                                                defaultPadding /
-                                                                    2
-                                                            : 0),
-                                                    decoration: BoxDecoration(
-                                                      color: isMe
-                                                          ? Colors.blue
-                                                          : Colors.white,
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10),
+                                    margin: EdgeInsets.symmetric(
+                                        vertical: defaultPadding / 4,
+                                        horizontal: defaultPadding),
+                                    child: GestureDetector(
+                                        key: key,
+                                        onLongPress: () => {
+                                              showOverlay(message, key)
+                                              // Navigator.of(context).push(
+                                              //     PageRouteBuilder(
+                                              //         opaque: false,
+                                              //         pageBuilder:
+                                              //             (BuildContext context,
+                                              //                     _, __) =>
+                                              //                 MessageAction()))
+                                            },
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.end,
+                                          children: [
+                                            Row(
+                                                mainAxisAlignment: isMe
+                                                    ? MainAxisAlignment.end
+                                                    : MainAxisAlignment.start,
+                                                mainAxisSize: MainAxisSize.min,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  if (showAvatar)
+                                                    Avatar(
+                                                      size: 16,
+                                                      url: message
+                                                          .fromUser!.avatar,
+                                                      isNetwork: true,
+                                                      name: message
+                                                          .fromUser!.tiktokId,
                                                     ),
-                                                    child: Text(
-                                                      message.content!,
-                                                      style: TextStyle(
+                                                  const SizedBox(
+                                                    width: defaultPadding / 2,
+                                                  ),
+                                                  Flexible(
+                                                      child: Column(
+                                                    crossAxisAlignment: isMe
+                                                        ? CrossAxisAlignment.end
+                                                        : CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      if (message.parent !=
+                                                          null)
+                                                        Text(isMe
+                                                            ? "You replied"
+                                                            : "Replied to you"),
+                                                      if (message.parent !=
+                                                          null)
+                                                        Container(
+                                                            padding:
+                                                                EdgeInsets.all(
+                                                                    10),
+                                                            margin: EdgeInsets.only(
+                                                                top:
+                                                                    defaultPadding /
+                                                                        2),
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              color: Colors.grey
+                                                                  .shade300,
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          10),
+                                                            ),
+                                                            child: Text(
+                                                              message.parent!
+                                                                  .content!,
+                                                              overflow:
+                                                                  TextOverflow
+                                                                      .ellipsis,
+                                                              style: TextStyle(
+                                                                  color: Colors
+                                                                      .black54),
+                                                            )),
+                                                      Container(
+                                                        padding:
+                                                            EdgeInsets.all(10),
+                                                        margin: EdgeInsets.only(
+                                                            left: !showAvatar
+                                                                ? 24 +
+                                                                    defaultPadding /
+                                                                        2
+                                                                : 0),
+                                                        decoration:
+                                                            BoxDecoration(
                                                           color: isMe
-                                                              ? Colors.white
-                                                              : Colors.black),
-                                                    ),
-                                                  ),
-                                                )
-                                              ]),
-                                          if (isMe &&
-                                              index == messages.length - 1)
-                                            Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      vertical:
-                                                          defaultPadding / 4,
-                                                      horizontal:
-                                                          defaultPadding / 2),
-                                              child: Text(
-                                                  messages[index].isSending ==
-                                                          true
-                                                      ? "sending..."
-                                                      : "sent"),
-                                            )
-                                        ],
-                                      )),
+                                                              ? Colors.blue
+                                                              : Colors.white,
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(10),
+                                                        ),
+                                                        child: Text(
+                                                          message.content!,
+                                                          style: TextStyle(
+                                                              color: isMe
+                                                                  ? Colors.white
+                                                                  : Colors
+                                                                      .black),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ))
+                                                ]),
+                                            if (isMe &&
+                                                index == messages.length - 1)
+                                              Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        vertical:
+                                                            defaultPadding / 4,
+                                                        horizontal:
+                                                            defaultPadding / 2),
+                                                child: Text(
+                                                    messages[index].isSending ==
+                                                            true
+                                                        ? "sending..."
+                                                        : "sent"),
+                                              )
+                                          ],
+                                        )),
+                                  ),
                                 ));
                           },
                           childCount: messages.length,
@@ -390,6 +532,33 @@ class _DetailMessageScreenState extends State<DetailMessageScreen>
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
+                                if (replyMessage == true &&
+                                    selectedMessage != null)
+                                  Container(
+                                    padding: EdgeInsets.only(
+                                        top: defaultPadding / 2),
+                                    child: Row(
+                                      children: [
+                                        Expanded(
+                                          child: Row(
+                                            children: [
+                                              Text(
+                                                  "${selectedMessage!.fromUser!.firstName!}:"),
+                                              Expanded(
+                                                  child: Text(
+                                                selectedMessage!.content!,
+                                                overflow: TextOverflow.ellipsis,
+                                              ))
+                                            ],
+                                          ),
+                                        ),
+                                        TextButton(
+                                            onPressed: hideOverlay,
+                                            child: Text("X"))
+                                      ],
+                                    ),
+                                  ),
+
                                 // Row(
                                 //   children: [
                                 //     buildTag(Icons.favorite, "", Colors.pink),
@@ -445,6 +614,7 @@ class _DetailMessageScreenState extends State<DetailMessageScreen>
                                           ),
                                           child: TextField(
                                             autofocus: false,
+                                            focusNode: focusNode,
                                             controller: textController,
                                             maxLines:
                                                 null, // Auto-expands based on content
@@ -495,6 +665,109 @@ class _DetailMessageScreenState extends State<DetailMessageScreen>
               ],
             ),
           ),
+          if (showAction)
+            Stack(
+              children: [
+                GestureDetector(
+                  onTap: hideOverlay,
+                  child: Container(
+                    color: Colors.grey.withOpacity(0.6),
+                    child: Stack(
+                      children: [
+                        Positioned(
+                          left: selectedMessagePosition!.dx,
+                          top: selectedMessagePosition!.dy,
+                          child: Container(
+                            child: Align(
+                              alignment: Alignment.centerLeft,
+                              child: ConstrainedBox(
+                                constraints: BoxConstraints(
+                                  maxWidth: MediaQuery.of(context).size.width *
+                                      0.75, // 75% of screen width
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        mainAxisSize: MainAxisSize.min,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          if (true)
+                                            Avatar(
+                                              size: 16,
+                                              url: selectedMessage!
+                                                  .fromUser!.avatar,
+                                              isNetwork: true,
+                                              name: selectedMessage!
+                                                  .fromUser!.tiktokId,
+                                            ),
+                                          const SizedBox(
+                                            width: defaultPadding / 2,
+                                          ),
+                                          Flexible(
+                                            child: Container(
+                                              padding: EdgeInsets.all(10),
+                                              decoration: BoxDecoration(
+                                                color: Colors.white,
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
+                                              ),
+                                              child: Text(
+                                                selectedMessage!.content!,
+                                                style: TextStyle(
+                                                    color: Colors.black),
+                                              ),
+                                            ),
+                                          )
+                                        ]),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Row(
+                              children: [
+                                const SizedBox(
+                                  width: defaultPadding,
+                                ),
+                                genIcon("assets/icons/reply.svg", "Reply",
+                                    handleReplyMessage),
+                                const SizedBox(
+                                  width: defaultPadding,
+                                ),
+                                genIcon("assets/icons/forward.svg", "Forward",
+                                    () => {}),
+                                const SizedBox(
+                                  width: defaultPadding,
+                                ),
+                                genIcon(
+                                    "assets/icons/copy.svg", "Copy", () => {}),
+                                const SizedBox(
+                                  width: defaultPadding,
+                                ),
+                                genIcon("assets/icons/delete.svg", "Delete",
+                                    () => {},
+                                    color: Colors.red),
+                              ],
+                            ),
+                            SizedBox(
+                              height: defaultPadding,
+                            )
+                          ],
+                        )
+                      ],
+                    ),
+                  ),
+                )
+              ],
+            )
         ]));
   }
 }

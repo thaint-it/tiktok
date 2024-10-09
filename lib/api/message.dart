@@ -64,4 +64,19 @@ class MessageService {
       throw e.toString();
     }
   }
+
+   Future<List<Message>?> messageCatogories() async {
+    try {
+      final response = await _dio.dio.get(Endpoints.messageCategories);
+      return (response.data as List<dynamic>?)
+          ?.map((e) => Message.fromJson(e as Map<String, dynamic>))
+          .toList();
+    } on DioException catch (err) {
+      final errorMessage = DioClientException.fromDioError(err).toString();
+      throw errorMessage;
+    } catch (e) {
+      if (kDebugMode) print(e);
+      throw e.toString();
+    }
+  }
 }

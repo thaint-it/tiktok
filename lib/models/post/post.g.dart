@@ -44,6 +44,19 @@ Map<String, dynamic> _$PostToJson(Post instance) => <String, dynamic>{
       'user': instance.user,
     };
 
+ActivityPost _$ActivityPostFromJson(Map<String, dynamic> json) => ActivityPost(
+      id: (json['id'] as num?)?.toInt(),
+      url: json['url'] as String?,
+      thumbnail: json['thumbnail'] as String?,
+    );
+
+Map<String, dynamic> _$ActivityPostToJson(ActivityPost instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'url': instance.url,
+      'thumbnail': instance.thumbnail,
+    };
+
 PostPagination _$PostPaginationFromJson(Map<String, dynamic> json) =>
     PostPagination(
       (json['posts'] as List<dynamic>?)

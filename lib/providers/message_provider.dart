@@ -4,11 +4,12 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 
 class MessageProvider with ChangeNotifier {
   List<User>? _users;
+  int _notifyCount = 0;
   WebSocketChannel? _channel;
 
   List<User>? get users => _users;
+  int get notifyCount => _notifyCount;
   WebSocketChannel? get channel => _channel;
-  
 
   void setUser(List<User>? newUsers) {
     _users = newUsers;
@@ -17,6 +18,11 @@ class MessageProvider with ChangeNotifier {
 
   void setChannel(WebSocketChannel? channel) {
     _channel = channel;
+    notifyListeners();
+  }
+
+  void setNotifyCount(int count) {
+    _notifyCount = count;
     notifyListeners();
   }
 

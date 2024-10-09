@@ -69,6 +69,34 @@ class Post {
 }
 
 @JsonSerializable()
+class ActivityPost {
+  final int? id;
+  final String? url;
+  final String? thumbnail;
+
+
+  ActivityPost(
+      {this.id,
+      this.url,
+      this.thumbnail,
+});
+
+  @override
+  bool? get stringify => true;
+
+  @override
+  List<Object?> get props => [
+        id,
+        url,
+        thumbnail,
+       
+      ];
+  factory ActivityPost.fromJson(Map<String, dynamic> json) => _$ActivityPostFromJson(json);
+  Map<String, dynamic> toJson() => _$ActivityPostToJson(this);
+}
+
+
+@JsonSerializable()
 class PostPagination {
   final List<Post>? posts;
   @JsonKey(name: 'has_next')

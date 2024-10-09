@@ -11,13 +11,21 @@ class Endpoints {
 
   static const String login = '/auth/login';
   static const String fetchUsers = '/auth';
+  static const String followerCategories= '/auth/follower_categories';
+  static const String followerActivities= '/auth/activities';
   static const String rfToken = '/auth/refresh_jwt_token';
   static const String register = '/auth/create_user';
   static const String changeAvatar = '/auth/update_avatar';
+  static const String notifyCount = '/auth/count_notify';
 
   static const String createPost = '/post/create_post';
   static const String post = '/post/list_post';
+  static const String activityCategories = '/post/activity_categories';
+  static const String postActivities = '/post/activities';
+    static const String likePost = '/post/like_post';
+    static const String favoritePost = '/post/favorite_post';
 
     static const String message = '/message';
     static const String messageById = '/message/get_by_id';
+    static const String messageCategories = '/message/message_categories';
 }

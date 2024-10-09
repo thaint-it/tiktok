@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:swipeable_page_route/swipeable_page_route.dart';
 import 'package:tiktok_clone/components/avatar.dart';
 import 'package:tiktok_clone/components/circle.dart';
 import 'package:tiktok_clone/constants.dart';
@@ -7,6 +8,7 @@ import 'package:tiktok_clone/models/auth/user.dart';
 import 'package:tiktok_clone/models/auth/user_data.dart';
 import 'package:tiktok_clone/providers/message_provider.dart';
 import 'package:tiktok_clone/providers/user_data_provider.dart';
+import 'package:tiktok_clone/screens/message/views/detail_message.dart';
 
 class UserActive {
   final String? avatar;
@@ -112,6 +114,14 @@ class _UserOnlineState extends State<UserOnline> {
                       Stack(
                         children: [
                           InkWell(
+                              onTap: () => {
+                                    Navigator.of(context)
+                                        .push(SwipeablePageRoute(
+                                      canOnlySwipeFromEdge: false,
+                                      builder: (BuildContext context) =>
+                                          DetailMessageScreen(user: user),
+                                    ))
+                                  },
                               child: Avatar(
                                   size: 32,
                                   url: user.avatar,
