@@ -42,7 +42,6 @@ class _CropAvatarState extends State<CropAvatar> {
           Navigator.of(context).pop();
         }
 
-        print("response ${response!.avatar} ");
       }
     } catch (e) {
       print('An error occurred: $e');

@@ -54,7 +54,6 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
       });
       final response = await postService.createPost(data: data);
       if (response == true) {
-        print('create post success!');
         if (mounted) {
           Navigator.of(context).pop();
         }

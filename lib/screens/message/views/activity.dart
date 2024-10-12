@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:tiktok_clone/api/auth.dart';
 import 'package:tiktok_clone/api/enpoints.dart';
 import 'package:tiktok_clone/api/post.dart';
 import 'package:tiktok_clone/components/avatar.dart';
 import 'package:tiktok_clone/constants.dart';
+import 'package:tiktok_clone/entry_point.dart';
 import 'package:tiktok_clone/injections/injection.dart';
 import 'package:tiktok_clone/models/activities/activities.dart';
+import 'package:tiktok_clone/screens/post/views/post.dart';
 import 'package:tiktok_clone/utils/utils.dart';
 
 class ActivityScreen extends StatefulWidget {
@@ -17,30 +20,61 @@ class ActivityScreen extends StatefulWidget {
 class _ActivityScreenState extends State<ActivityScreen> {
   late List<Activity> activities = [];
   PostService postService = getIt<PostService>();
+  AuthService authService = getIt<AuthService>();
 
   // Giả lập tải video ban đầu
   Future<void> fetchData() async {
     List<Activity>? activitiesData = await postService.activities();
     setState(() {
-      print(activitiesData);
       activities = activitiesData!;
     });
+  }
+
+  // Giả lập tải video ban đầu
+  Future<void> readNotify() async {
+    await authService.readNotify({"type": "ACTIVITY"});
   }
 
   @override
   void initState() {
     // TODO: implement initState
     fetchData();
+    readNotify();
   }
 
-  String getActivityMessage(String action) {
+  String getActivityMessage(String action, String? content) {
     switch (action) {
       case "LIKE":
         return "liked your video.";
       case "FAVORITE":
         return "added your video to Favorites.";
+      case "COMMENT":
+        return "commented: $content";
     }
     return "";
+  }
+
+  viewPost(int id) {
+    // Navigate to ScreenThree with the desired page index (e.g., 2 for Page 3)
+    Navigator.of(context)
+        .pushReplacement(
+      MaterialPageRoute(
+        builder: (context) => EntryPointScreen(
+            initialIdex: 0, postId: id,), // Switch to HomeScreen and set active tab
+      ),
+    );
+    //     .then((_) {
+    //   if (mounted) {
+    //     // After navigating back to HomeScreen, push ScreenThree with the specified page index
+    //     Navigator.of(context).push(
+    //       MaterialPageRoute(
+    //         builder: (context) => PostScreen(
+    //           id: id,
+    //         ), // Navigate to Page 2
+    //       ),
+    //     );
+    //   }
+    // });
   }
 
   @override
@@ -91,7 +125,7 @@ class _ActivityScreenState extends State<ActivityScreen> {
                               padding: const EdgeInsets.symmetric(
                                   vertical: defaultPadding / 2),
                               child: InkWell(
-                                  onTap: () => {},
+                                  onTap: () => {viewPost(item.post!.id!)},
                                   child: Row(
                                     children: [
                                       Stack(
@@ -124,7 +158,7 @@ class _ActivityScreenState extends State<ActivityScreen> {
                                             height: defaultPadding / 8,
                                           ),
                                           Text(
-                                            getActivityMessage(item.action!),
+                                            getActivityMessage(item.action!, item.content),
                                             overflow: TextOverflow.ellipsis,
                                             style: TextStyle(
                                                 color: Colors.black87),

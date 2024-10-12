@@ -13,11 +13,12 @@ class Comment {
   @JsonKey(name: 'reply_comment_id')
   int? replyCommentId;
   String? content;
-  DateTime? created;
+  @JsonKey(name: 'created_at')
+  DateTime? createdAt;
   List<Comment>? children;
-  @JsonKey(name: 'is_creator')
-  bool? isCreator;
   User? user;
+  @JsonKey(name: 'parent_id')
+  int? parentId;
 
   Comment(
       {this.id,
@@ -25,10 +26,10 @@ class Comment {
       this.postId,
       this.replyCommentId,
       required this.content,
-      required this.created,
+      required this.createdAt,
       required this.children,
       this.user,
-      this.isCreator});
+      this.parentId});
 
   @override
   bool? get stringify => true;
@@ -40,12 +41,13 @@ class Comment {
         postId,
         replyCommentId,
         content,
-        created,
+        createdAt,
         children,
-        user,
-        isCreator
+        user
+        ,parentId
       ];
   factory Comment.fromJson(Map<String, dynamic> json) =>
       _$CommentFromJson(json);
   Map<String, dynamic> toJson() => _$CommentToJson(this);
 }
+

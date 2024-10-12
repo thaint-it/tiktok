@@ -32,7 +32,6 @@ class MessageProvider with ChangeNotifier {
       // Find the index of the user to update
       int index = _users!.indexWhere((user) => user.id == userId);
       if (index != -1) {
-        print("user inde ${_users![index].firstName} is online $isOnline");
         // Update the user in the list
         _users![index].isOnline = isOnline;
         // Notify listeners about the change

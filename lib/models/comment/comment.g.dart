@@ -12,16 +12,16 @@ Comment _$CommentFromJson(Map<String, dynamic> json) => Comment(
       postId: (json['post_id'] as num?)?.toInt(),
       replyCommentId: (json['reply_comment_id'] as num?)?.toInt(),
       content: json['content'] as String?,
-      created: json['created'] == null
+      createdAt: json['created_at'] == null
           ? null
-          : DateTime.parse(json['created'] as String),
+          : DateTime.parse(json['created_at'] as String),
       children: (json['children'] as List<dynamic>?)
           ?.map((e) => Comment.fromJson(e as Map<String, dynamic>))
           .toList(),
       user: json['user'] == null
           ? null
           : User.fromJson(json['user'] as Map<String, dynamic>),
-      isCreator: json['is_creator'] as bool?,
+      parentId: (json['parent_id'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$CommentToJson(Comment instance) => <String, dynamic>{
@@ -30,8 +30,8 @@ Map<String, dynamic> _$CommentToJson(Comment instance) => <String, dynamic>{
       'post_id': instance.postId,
       'reply_comment_id': instance.replyCommentId,
       'content': instance.content,
-      'created': instance.created?.toIso8601String(),
+      'created_at': instance.createdAt?.toIso8601String(),
       'children': instance.children,
-      'is_creator': instance.isCreator,
       'user': instance.user,
+      'parent_id': instance.parentId,
     };

@@ -50,17 +50,13 @@ class AuthService {
         'avatar': await MultipartFile.fromFile(avatar.path),
         'user_id': userId,
       });
-      print('created formdata $formData');
       final response =
           await _dio.dio.post(Endpoints.changeAvatar, data: formData);
-      print("om $response");
       return UserAvatar.fromJson(response.data);
     } on DioException catch (err) {
-      print('falure $err');
       final errorMessage = DioClientException.fromDioError(err).toString();
       throw errorMessage;
     } catch (e) {
-      if (kDebugMode) print(e);
       throw e.toString();
     }
   }
@@ -93,7 +89,7 @@ class AuthService {
     }
   }
 
-   Future<List<FollowerActivity>?> followerActivities() async {
+  Future<List<FollowerActivity>?> followerActivities() async {
     try {
       final response = await _dio.dio.get(Endpoints.followerActivities);
       return (response.data as List<dynamic>?)
@@ -112,6 +108,19 @@ class AuthService {
     try {
       final response = await _dio.dio.get(Endpoints.notifyCount);
       return response.data;
+    } on DioException catch (err) {
+      final errorMessage = DioClientException.fromDioError(err).toString();
+      throw errorMessage;
+    } catch (e) {
+      if (kDebugMode) print(e);
+      throw e.toString();
+    }
+  }
+
+  Future<bool?> readNotify(data) async {
+    try {
+      await _dio.dio.post(Endpoints.readNotify, data: data);
+      return true;
     } on DioException catch (err) {
       final errorMessage = DioClientException.fromDioError(err).toString();
       throw errorMessage;

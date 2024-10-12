@@ -32,7 +32,9 @@ class AppBarItem {
 }
 
 class EntryPointScreen extends StatefulWidget {
-  const EntryPointScreen({super.key});
+  const EntryPointScreen({super.key, this.initialIdex = 0, this.postId});
+  final int initialIdex;
+  final int? postId;
 
   @override
   State<EntryPointScreen> createState() => _EntryPointScreenState();
@@ -50,7 +52,6 @@ class _EntryPointScreenState extends State<EntryPointScreen> {
   Future<void> initSignal() async {
     User? user = await storageService.getUser();
     if (user != null) {
-      print("init signal ${user.id}");
       channel = WebSocketChannel.connect(
         Uri.parse(
             'ws://${Endpoints.socketURL}/ws/notification/${user.id}/'), // Update with your server URL
@@ -62,22 +63,23 @@ class _EntryPointScreenState extends State<EntryPointScreen> {
       channel!.stream.listen((message) {
         // // Handle incoming messages
         final data = jsonDecode(message);
-        print("recieve new message $data");
 
         final users = messageProvider.users;
-        if (users != null &&
-            (data['type'] == "CONNECTED" || data['type'] == "DISCONNECTED")) {
-          messageProvider.updateUserOnlineStatus(
-              data['id'], data['type'] == "CONNECTED");
+        switch (data['type']) {
+          case "CONNECTED":
+          case "DISCONNECTED":
+            messageProvider.updateUserOnlineStatus(
+                data['id'], data['type'] == "CONNECTED");
+          case "LIKE":
+          case "FAVORITE":
+          case "COMMENT":
+            messageProvider.setNotifyCount(messageProvider.notifyCount + 1);
         }
-        if ((data['type'] == "LIKE" || data['type'] == "FAVORITE")) {
-          final notifyCount=messageProvider.notifyCount;
-          messageProvider.setNotifyCount(notifyCount + 1);
-        }
-        // You can also update your UI here
       });
     }
-    FocusScope.of(context).unfocus();
+    if (mounted) {
+      FocusScope.of(context).unfocus();
+    }
   }
 
   Future<void> getNofifyCount() async {
@@ -91,10 +93,15 @@ class _EntryPointScreenState extends State<EntryPointScreen> {
   void initState() {
     // This will hide the keyboard
     super.initState();
-    getNofifyCount();
+    setState(() {
+      selectedIndex = widget.initialIdex;
+    });
     userProvider = Provider.of<UserProvider>(context, listen: false);
     userProvider!.watchUserChange((newUser) {
-      initSignal();
+      if (newUser != null) {
+        getNofifyCount();
+        initSignal();
+      }
     });
   }
 
@@ -150,7 +157,7 @@ class _EntryPointScreenState extends State<EntryPointScreen> {
 
     if (userProvider.user == null) {
       _pages = [
-        PostScreen(),
+        PostScreen(id: widget.postId),
         NonAuthScreen(),
         NonAuthScreen(),
         NonAuthScreen(),
@@ -158,7 +165,7 @@ class _EntryPointScreenState extends State<EntryPointScreen> {
       ];
     } else {
       _pages = [
-        PostScreen(),
+        PostScreen(id: widget.postId),
         ShopScreen(),
         Container(),
         MessageScreen(),

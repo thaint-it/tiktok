@@ -153,7 +153,6 @@ class _DetailMessageScreenState extends State<DetailMessageScreen>
 
   @override
   void dispose() {
-    print("dispose");
     focusNode.dispose(); // Dispose of the FocusNode when not needed
     WidgetsBinding.instance.removeObserver(this);
     scrollController.dispose(); // Dispose of the controller

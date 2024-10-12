@@ -52,7 +52,6 @@ class AuthorizationInterceptor extends Interceptor {
     DioException err,
     ErrorInterceptorHandler handler,
   ) async {
-    print("error api... ${err.response?.statusCode}");
     if (err.response?.statusCode == 401) {
       final rfToken = await _storageService.getRFToken();
       try {

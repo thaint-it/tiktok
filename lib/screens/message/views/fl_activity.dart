@@ -21,15 +21,20 @@ class _FollowActivityScreenState extends State<FollowActivityScreen> {
     List<FollowerActivity>? activitiesData =
         await authService.followerActivities();
     setState(() {
-      print(activitiesData);
       activities = activitiesData!;
     });
+  }
+
+    // Giả lập tải video ban đầu
+  Future<void> readNotify() async {
+    await authService.readNotify({"type": "FOLLOWER"});
   }
 
   @override
   void initState() {
     // TODO: implement initState
     fetchData();
+    readNotify();
   }
 
   @override

@@ -78,6 +78,13 @@ class _MessageScreenState extends State<MessageScreen> {
     }
   }
 
+  Future<void> getNofifyCount() async {
+    final count = await authService.notifyCount();
+    final messageProvider =
+        Provider.of<MessageProvider>(context, listen: false);
+    messageProvider.setNotifyCount(count);
+  }
+
   @override
   void initState() {
     // TODO: implement initState
@@ -88,12 +95,14 @@ class _MessageScreenState extends State<MessageScreen> {
     fetchActivityCategories();
   }
 
-  String getActivityMessage(String action) {
+  String getActivityMessage(String action,String? content) {
     switch (action) {
       case "LIKE":
         return "liked your video.";
       case "FAVORITE":
         return "added your video to Favorites.";
+      case "COMMENT":
+        return "commented: $content";
     }
     return "";
   }
@@ -101,15 +110,27 @@ class _MessageScreenState extends State<MessageScreen> {
   void handleNavigate(item, String type) {
     switch (type) {
       case "FOLLOWER":
-        Navigator.of(context).push(SwipeablePageRoute(
+        Navigator.of(context)
+            .push(SwipeablePageRoute(
           canOnlySwipeFromEdge: false,
           builder: (BuildContext context) => FollowActivityScreen(),
-        ));
+        ))
+            .then((_) {
+          fetchFLCategories();
+          fetchActivityCategories();
+          getNofifyCount();
+        });
       case "ACTIVITY":
-        Navigator.of(context).push(SwipeablePageRoute(
+        Navigator.of(context)
+            .push(SwipeablePageRoute(
           canOnlySwipeFromEdge: false,
           builder: (BuildContext context) => ActivityScreen(),
-        ));
+        ))
+            .then((_) {
+          fetchFLCategories();
+          fetchActivityCategories();
+           getNofifyCount();
+        });
       case "MESSAGE":
         final userProvider = Provider.of<UserProvider>(context, listen: false);
         final targetUser = item.fromUser!.id == userProvider.user!.id
@@ -244,7 +265,8 @@ class _MessageScreenState extends State<MessageScreen> {
                         const EdgeInsets.symmetric(horizontal: defaultPadding),
                     child: Column(
                       children: [
-                        if (followerActivityCategory != null)
+                        if (followerActivityCategory != null &&
+                            followerActivityCategory!.follower!.id != null)
                           category(
                               followerActivityCategory,
                               "assets/avatars/follower.jpg",
@@ -253,13 +275,14 @@ class _MessageScreenState extends State<MessageScreen> {
                               "${followerActivityCategory!.follower!.firstName!} started follwing you",
                               followerActivityCategory!.isRead!,
                               "FOLLOWER"),
-                        if (activityCategory != null)
+                        if (activityCategory != null &&
+                            activityCategory!.user!.id != null)
                           category(
                               activityCategory,
                               "assets/avatars/notify.jpg",
                               false,
                               "Activity",
-                              "${activityCategory!.user!.firstName!} ${getActivityMessage(activityCategory!.action!)}",
+                              "${activityCategory!.user!.firstName!} ${getActivityMessage(activityCategory!.action!, activityCategory!.content)}",
                               activityCategory!.isRead!,
                               "ACTIVITY"),
                         if (messageCategories.isNotEmpty)

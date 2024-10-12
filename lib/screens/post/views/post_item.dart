@@ -136,7 +136,14 @@ class _VideoPostState extends State<VideoPost> {
     }
 
     void showComment() {
-      showModalBottomSheet(context: context, builder: (ctx) => CommentScreen());
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        useSafeArea: true,
+        builder: (ctx) => CommentScreen(
+          post: widget.post,
+        ),
+      );
     }
 
     return Stack(
@@ -208,6 +215,14 @@ class _VideoPostState extends State<VideoPost> {
                                     const SizedBox(
                                       height: defaultPadding,
                                     ),
+                                    InkWell(
+                                      onTap: showComment,
+                                      child: svgIcon("assets/icons/comment.svg",
+                                          color: Colors.white),
+                                    ),
+                                    const SizedBox(height: defaultPadding / 8),
+                                    genCount(commentCount),
+                                    const SizedBox(height: defaultPadding),
                                     LikeButton(
                                       size: 30,
                                       isLiked: isMarked,
@@ -218,14 +233,6 @@ class _VideoPostState extends State<VideoPost> {
                                     ),
                                     const SizedBox(height: defaultPadding / 8),
                                     genCount(markCount),
-                                    const SizedBox(height: defaultPadding),
-                                    InkWell(
-                                      onTap: showComment,
-                                      child: svgIcon("assets/icons/comment.svg",
-                                          color: Colors.white),
-                                    ),
-                                    const SizedBox(height: defaultPadding / 8),
-                                    genCount(commentCount),
                                     const SizedBox(height: defaultPadding),
                                     InkWell(
                                       onTap: () => {},

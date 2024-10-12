@@ -17,7 +17,8 @@ class AppBarItem {
 }
 
 class PostScreen extends StatefulWidget {
-  const PostScreen({super.key});
+  const PostScreen({super.key, this.id});
+  final int? id;
 
   @override
   State<PostScreen> createState() => _PostScreenState();
@@ -52,9 +53,6 @@ class _PostScreenState extends State<PostScreen> {
     return Future.value(!_isMarked);
   }
 
-  void showComment() {
-    showModalBottomSheet(context: context, builder: (ctx) => CommentScreen());
-  }
 
   final PageController _pageController = PageController(initialPage: 0);
 
@@ -72,14 +70,23 @@ class _PostScreenState extends State<PostScreen> {
         await postService.fetchPosts(page: page, perPage: perPage);
 
     setState(() {
-      posts = initialPost.posts!;
+      posts.addAll(initialPost.posts!);
       hasNext = initialPost.hasNext!;
     });
   }
 
+  // Load special post
+  Future<void> loadPostById(int id) async {
+    Post initialPost = await postService.fetchPostById(id);
+
+    setState(() {
+      posts.add(initialPost);
+    });
+    loadInitialPosts();
+  }
+
   // reload new data
   Future<void> refreshPage() async {
-    print("refresh page...");
     setState(() {
       page = 1;
       hasNext = true;
@@ -109,15 +116,19 @@ class _PostScreenState extends State<PostScreen> {
   @override
   void initState() {
     super.initState();
-    loadInitialPosts();
+    if (widget.id != null) {
+      loadPostById(widget.id!);
+    } else {
+      loadInitialPosts();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-       extendBodyBehindAppBar: true,
-       backgroundColor: blackColor,
-      appBar: AppBar(
+        extendBodyBehindAppBar: true,
+        backgroundColor: blackColor,
+        appBar: AppBar(
           toolbarHeight: 40,
           forceMaterialTransparency: true,
           backgroundColor: Colors.black,
@@ -132,7 +143,6 @@ class _PostScreenState extends State<PostScreen> {
               width: 24,
             ),
           ),
-          
           actions: [
             ...homeAppBarItems.asMap().entries.map((entry) {
               AppBarItem item = entry.value;
@@ -182,7 +192,6 @@ class _PostScreenState extends State<PostScreen> {
 
                 // Kiểm tra xem người dùng đã gần đến cuối danh sách chưa
                 if (index == posts.length - 1) {
-                  print("loder mode...");
                   loadMoreVideos(); // Tải thêm video
                 }
               },
