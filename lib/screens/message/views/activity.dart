@@ -50,6 +50,8 @@ class _ActivityScreenState extends State<ActivityScreen> {
         return "added your video to Favorites.";
       case "COMMENT":
         return "commented: $content";
+      case "REPLY_COMMENT":
+        return "replied comment: $content";
     }
     return "";
   }

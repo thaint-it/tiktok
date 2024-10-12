@@ -103,6 +103,8 @@ class _MessageScreenState extends State<MessageScreen> {
         return "added your video to Favorites.";
       case "COMMENT":
         return "commented: $content";
+      case "REPLY_COMMENT":
+        return "replied comment: $content";
     }
     return "";
   }

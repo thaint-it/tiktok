@@ -33,6 +33,7 @@ class _CommentScreenState extends State<CommentScreen> {
   late FocusNode focusNode;
   Comment? replyComment;
 
+  int commentCount = 0;
   // Giả lập tải video ban đầu
   Future<void> fetchComments(id) async {
     final data = await postService.listComment(widget.post.id);
@@ -44,18 +45,20 @@ class _CommentScreenState extends State<CommentScreen> {
   // Giả lập tải video ban đầu
   Future<void> fetchNewComment(id) async {
     Comment newComment = await postService.commentById(id);
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
     setState(() {
-      if (newComment.parentId != null) {
-        final parent =
-            comments.firstWhere((entry) => entry.id == newComment.parentId);
-        if (parent.children == null) {
-          parent.children = [newComment];
+      commentCount += 1;
+        if (newComment.parentId != null) {
+          final parent =
+              comments.firstWhere((entry) => entry.id == newComment.parentId);
+          if (parent.children == null) {
+            parent.children = [newComment];
+          } else {
+            parent.children!.add(newComment);
+          }
         } else {
-          parent.children!.add(newComment);
+          comments.add(newComment);
         }
-      } else {
-        comments.add(newComment);
-      }
     });
   }
 
@@ -65,11 +68,11 @@ class _CommentScreenState extends State<CommentScreen> {
         createdAt: DateTime.now(),
         children: [],
         user: user);
-    if (replyComment != null) {
-      replyComment!.children!.add(newComment);
-    } else {
-      comments.add(newComment);
-    }
+    // if (replyComment != null) {
+    //   replyComment!.children!.add(newComment);
+    // } else {
+    //   comments.add(newComment);
+    // }
     await postService.addComment({
       "post_id": widget.post.id,
       "content": newComment.content,
@@ -112,6 +115,7 @@ class _CommentScreenState extends State<CommentScreen> {
     // TODO: implement initState
     super.initState();
     focusNode = FocusNode();
+    commentCount = widget.post.commentCount!;
     textController.addListener(() {
       setState(() {}); // Rebuild the widget on text change
     });
@@ -148,7 +152,7 @@ class _CommentScreenState extends State<CommentScreen> {
                 Expanded(
                     child: Align(
                   child: Text(
-                    "${widget.post.commentCount} Comments",
+                    "${commentCount.toString()} Comments",
                     style: TextStyle(color: Colors.black),
                   ),
                 )),
