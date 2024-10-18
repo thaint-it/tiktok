@@ -24,6 +24,7 @@ class Endpoints {
   static const String post = '/post/list_post';
   static const String postById = '/post/post_by_id';
   static const String activityCategories = '/post/activity_categories';
+  static const String activityById = '/post/activity_by_id';
   static const String postActivities = '/post/activities';
   static const String likePost = '/post/like_post';
   static const String favoritePost = '/post/favorite_post';

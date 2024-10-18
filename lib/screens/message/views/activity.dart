@@ -42,19 +42,7 @@ class _ActivityScreenState extends State<ActivityScreen> {
     readNotify();
   }
 
-  String getActivityMessage(String action, String? content) {
-    switch (action) {
-      case "LIKE":
-        return "liked your video.";
-      case "FAVORITE":
-        return "added your video to Favorites.";
-      case "COMMENT":
-        return "commented: $content";
-      case "REPLY_COMMENT":
-        return "replied comment: $content";
-    }
-    return "";
-  }
+ 
 
   viewPost(int id) {
     // Navigate to ScreenThree with the desired page index (e.g., 2 for Page 3)
@@ -160,7 +148,7 @@ class _ActivityScreenState extends State<ActivityScreen> {
                                             height: defaultPadding / 8,
                                           ),
                                           Text(
-                                            getActivityMessage(item.action!, item.content),
+                                            Utils.getActivityMessage(item),
                                             overflow: TextOverflow.ellipsis,
                                             style: TextStyle(
                                                 color: Colors.black87),

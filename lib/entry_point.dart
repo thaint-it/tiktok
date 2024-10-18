@@ -1,16 +1,20 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:tiktok_clone/api/auth.dart';
 import 'package:tiktok_clone/api/enpoints.dart';
+import 'package:tiktok_clone/api/notification.dart';
+import 'package:tiktok_clone/api/post.dart';
 import 'package:tiktok_clone/components/custom_icon.dart';
 import 'package:tiktok_clone/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:animations/animations.dart';
 import 'package:tiktok_clone/injections/injection.dart';
+import 'package:tiktok_clone/models/activities/activities.dart';
 import 'package:tiktok_clone/models/auth/user.dart';
 import 'package:tiktok_clone/providers/message_provider.dart';
 import 'package:tiktok_clone/providers/user_data_provider.dart';
@@ -32,9 +36,17 @@ class AppBarItem {
 }
 
 class EntryPointScreen extends StatefulWidget {
-  const EntryPointScreen({super.key, this.initialIdex = 0, this.postId});
+  const EntryPointScreen(
+      {super.key,
+      this.notificationAppLaunchDetails,
+      this.initialIdex = 0,
+      this.postId});
   final int initialIdex;
   final int? postId;
+
+  final NotificationAppLaunchDetails? notificationAppLaunchDetails;
+  bool get didNotificationLaunchApp =>
+      notificationAppLaunchDetails?.didNotificationLaunchApp ?? false;
 
   @override
   State<EntryPointScreen> createState() => _EntryPointScreenState();
@@ -45,6 +57,8 @@ class _EntryPointScreenState extends State<EntryPointScreen> {
   WebSocketChannel? channel;
   StorageService storageService = getIt<StorageService>();
   AuthService authService = getIt<AuthService>();
+  PostService postService = getIt<PostService>();
+  NoticationService noticationService = getIt<NoticationService>();
   int unreadMessage = 10;
 
   UserProvider? userProvider;
@@ -73,13 +87,20 @@ class _EntryPointScreenState extends State<EntryPointScreen> {
           case "LIKE":
           case "FAVORITE":
           case "COMMENT":
+          case "REPLY_COMMENT":
             messageProvider.setNotifyCount(messageProvider.notifyCount + 1);
+            pushNotitication(data['id']);
         }
       });
     }
     if (mounted) {
       FocusScope.of(context).unfocus();
     }
+  }
+
+  Future<void> pushNotitication(id) async {
+    Activity activity=await postService.activityById(id);
+    noticationService.showNotificationWithAttachment(activity);
   }
 
   Future<void> getNofifyCount() async {

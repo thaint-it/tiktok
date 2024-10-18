@@ -113,7 +113,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 const BottomSheetHeader(),
                 const SizedBox(height: defaultPadding * 3),
                 Text(
-                  "Login",
+                  "Register",
                   style: TextStyle(
                       color: blackColor,
                       fontWeight: FontWeight.bold,
@@ -173,7 +173,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             backgroundColor: Colors.pink,
                             minimumSize: Size(double.infinity, 40)),
                         child: Text(
-                          "Login",
+                          "Register",
                           style: TextStyle(color: Colors.white, fontSize: 14),
                         ),
                       )

@@ -159,4 +159,22 @@ class PostService {
       throw e.toString();
     }
   }
+
+  Future<Activity> activityById(commentId) async {
+    try {
+      final response = await _dio.dio.get(
+        Endpoints.activityById,
+        queryParameters: {
+          'id': commentId,
+        },
+      );
+      return Activity.fromJson(response.data);
+    } on DioException catch (err) {
+      final errorMessage = DioClientException.fromDioError(err).toString();
+      throw errorMessage;
+    } catch (e) {
+      if (kDebugMode) print(e);
+      throw e.toString();
+    }
+  }
 }
